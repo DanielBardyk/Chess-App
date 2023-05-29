@@ -11,12 +11,6 @@ import { Square } from "../Square/Square";
 
 type SquareType = Pawn | King | Queen | Bishop | Knight | Rook | filler_piece
 
-// type MyProps = { ... };
-// type MyState = { value: string };
-// class App extends React.Component<MyProps, MyState> {
-//     ...
-// }
-
 interface IStateBoard {
 	squares: SquareType[],
 	source: number,
@@ -36,19 +30,10 @@ interface IStateBoard {
 	bot_running: number,
 	pieces_collected_by_white: JSX.Element[],
 	pieces_collected_by_black: JSX.Element[],
-	history: any[][],
-	history_num: number,
-	history_h1: any[],
-	history_h2: any[],
-	history_h3: any[],
-	history_h4: any[],
-	history_white_collection: any[],
-	history_black_collection: any[],
 	mated: boolean,
 	move_made: boolean,
 	capture_made: boolean,
 	check_flash: boolean,
-	viewing_history: boolean,
 	just_clicked: boolean,
 };
 
@@ -75,19 +60,10 @@ class Board extends React.Component<any, IStateBoard> {
 			bot_running: 0,
 			pieces_collected_by_white: [],
 			pieces_collected_by_black: [],
-			history: [initializeBoard()],
-			history_num: 1,
-			history_h1: [null],
-			history_h2: [null],
-			history_h3: [null],
-			history_h4: [null],
-			history_white_collection: [null],
-			history_black_collection: [null],
 			mated: false,
 			move_made: false,
 			capture_made: false,
 			check_flash: false,
-			viewing_history: false,
 			just_clicked: false,
 		};
 	}
@@ -97,7 +73,6 @@ class Board extends React.Component<any, IStateBoard> {
 	///
 	reset() {
 		if (
-			this.state.history_num - 1 === this.state.turn_num &&
 			this.state.turn === "b" &&
 			!this.state.mated
 		)
@@ -121,19 +96,10 @@ class Board extends React.Component<any, IStateBoard> {
 			bot_running: 0,
 			pieces_collected_by_white: [],
 			pieces_collected_by_black: [],
-			history: [initializeBoard()],
-			history_num: 1,
-			history_h1: [null],
-			history_h2: [null],
-			history_h3: [null],
-			history_h4: [null],
-			history_white_collection: [null],
-			history_black_collection: [null],
 			mated: false,
 			move_made: false,
 			capture_made: false,
 			check_flash: false,
-			viewing_history: false,
 			just_clicked: false,
 		});
 	}
@@ -248,39 +214,6 @@ class Board extends React.Component<any, IStateBoard> {
 			).slice();
 		}
 
-		// adding state to history array
-		const copy_history = this.state.history.slice();
-		const copy_history_h1 = this.state.history_h1.slice();
-		const copy_history_h2 = this.state.history_h2.slice();
-		const copy_history_h3 = this.state.history_h3.slice();
-		const copy_history_h4 = this.state.history_h4.slice();
-		const copy_white_collection = this.state.history_white_collection.slice();
-		const copy_black_collection = this.state.history_black_collection.slice();
-		copy_history.push(copy_squares);
-		copy_history_h1.push(start);
-		copy_history_h2.push(end);
-		copy_white_collection.push(
-			player === "w" ? collection : this.state.pieces_collected_by_white
-		);
-		copy_black_collection.push(
-			player === "b" ? collection : this.state.pieces_collected_by_black
-		);
-
-		var isKing =
-			copy_squares[end].ascii === "k" || copy_squares[end].ascii === "K";
-		if (isKing && Math.abs(end - start) === 2) {
-			if (end === (copy_squares[end].ascii === "k" ? 62 : 6)) {
-					copy_history_h3.push(end - 1);
-					copy_history_h4.push(end + 1);
-			} else if (end === (copy_squares[end].ascii === "k" ? 58 : 2)) {
-					copy_history_h3.push(end + 1);
-					copy_history_h4.push(end - 2);
-			}
-		} else {
-			copy_history_h3.push(null);
-			copy_history_h4.push(null);
-		}
-
 		let check_mated =
 			this.checkmate("w", copy_squares) || this.checkmate("b", copy_squares);
 		let stale_mated =
@@ -289,14 +222,6 @@ class Board extends React.Component<any, IStateBoard> {
 
 		this.setState({
 			passant_pos: passant,
-			history: copy_history,
-			history_num: this.state.history_num + 1,
-			history_h1: copy_history_h1,
-			history_h2: copy_history_h2,
-			history_h3: copy_history_h3,
-			history_h4: copy_history_h4,
-			history_white_collection: copy_white_collection,
-			history_black_collection: copy_black_collection,
 			squares: copy_squares,
 			source: -1,
 			turn_num: this.state.turn_num + 1,
@@ -857,11 +782,6 @@ class Board extends React.Component<any, IStateBoard> {
 	handleClick(i: number) {
 		let copy_squares = this.state.squares.slice();
 
-		// не треба нам
-		if (this.state.history_num - 1 !== this.state.turn_num) {
-			return "currently viewing history";
-		}
-
 		// кінець гри
 		if (this.state.mated) return "game-over";
 
@@ -878,7 +798,6 @@ class Board extends React.Component<any, IStateBoard> {
 						just_clicked: false,
 						move_made: false,
 						capture_made: false,
-						viewing_history: false,
 					});
 					
 					// бере фігуру, тому прибираємо підсвітку, що позначає "шах"
@@ -1035,8 +954,6 @@ class Board extends React.Component<any, IStateBoard> {
 					if (this.state.bot_running === 1 && !this.state.mated)
 						square_cursor = "bot_running";
 					if (this.state.mated) square_cursor = "default";
-					if (this.state.history_num - 1 !== this.state.turn_num)
-						square_cursor = "not_allowed";
 
 					squareRows.push(
 						<Square
@@ -1054,9 +971,6 @@ class Board extends React.Component<any, IStateBoard> {
 
 		let black_mated = this.checkmate("b", this.state.squares);
 		let white_mated = this.checkmate("w", this.state.squares);
-		let not_history =
-			!(this.state.history_num - 1 !== this.state.turn_num) &&
-			!this.state.viewing_history;
 		let stale =
 			(this.stalemate("w", this.state.squares) && this.state.turn === "w") ||
 			(this.stalemate("b", this.state.squares) && this.state.turn === "b");
@@ -1182,7 +1096,7 @@ class Board extends React.Component<any, IStateBoard> {
 									</div>
 
 									<div className="button_wrapper">
-										<button
+										{/* <button
 											className="reset_button history"
 											onClick={() => this.viewHistory("back_atw")}
 										>
@@ -1193,11 +1107,11 @@ class Board extends React.Component<any, IStateBoard> {
 											onClick={() => this.viewHistory("back")}
 										>
 											<p className="button_font">&lt;</p>
-										</button>
+										</button> */}
 										<button className="reset_button" onClick={() => this.reset()}>
 											<p className="button_font">Restart Game</p>
 										</button>
-										<button
+										{/* <button
 											className="reset_button history"
 											onClick={() => this.viewHistory("next")}
 										>
@@ -1208,7 +1122,7 @@ class Board extends React.Component<any, IStateBoard> {
 											onClick={() => this.viewHistory("next_atw")}
 										>
 											<p className="button_font">&gt;&gt;</p>
-										</button>
+										</button> */}
 									</div>
 
 									<div className="mate_wrapper">
