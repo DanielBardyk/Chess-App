@@ -981,110 +981,100 @@ class Board extends React.Component<any, IStateBoard> {
 						<div className="right_screen bounceInDown">
 							<div className="side_box">
 									<div className="content">
-										<p className="header_font">ReactJS Chess</p>
-										<p className="medium_font">
-											Play against our friendly bot!&nbsp;&nbsp;
-											<a href="./how_to_play.html" target="_blank">
-													How to Play
-											</a>
-										</p>
+										<p className="header_font">Chess</p>
 									</div>
 							</div>
 
 							<div className="side_box">
-									<div className="content title">
-										<p className="header_2_font">Match Information</p>
+								<div className="wrapper">
+									<div className="player_box">
+										<p className="medium_font">White</p>
+										{this.state.pieces_collected_by_white}
 									</div>
+									<div className="player_box black_player_color">
+										<p className="medium_font">Black</p>
+										{this.state.pieces_collected_by_black}
+									</div>
+								</div>
+								<div className="wrapper">
+									{this.state.turn === "w" ? (
+										<div className="highlight_box"></div>
+									) : (
+										<div className="highlight_box transparent"></div>
+									)}
+									{this.state.turn === "b" ? (
+										<div className="highlight_box"></div>
+									) : (
+										<div className="highlight_box transparent"></div>
+									)}
+								</div>
 
-									<div className="wrapper">
-										<div className="player_box">
-											<p className="medium_font">White (You)</p>
-											{this.state.pieces_collected_by_white}
-										</div>
-										<div className="player_box black_player_color">
-											<p className="medium_font">Black (Bot)</p>
-											{this.state.pieces_collected_by_black}
-										</div>
-									</div>
-									<div className="wrapper">
-										{this.state.turn === "w" ? (
-											<div className="highlight_box"></div>
-										) : (
-											<div className="highlight_box transparent"></div>
-										)}
-										{this.state.turn === "b" ? (
-											<div className="highlight_box"></div>
-										) : (
-											<div className="highlight_box transparent"></div>
-										)}
-									</div>
+								<div className="button_wrapper">
+									{/* <button
+										className="reset_button history"
+										onClick={() => this.viewHistory("back_atw")}
+									>
+										<p className="button_font">&lt;&lt;</p>
+									</button>
+									<button
+										className="reset_button history"
+										onClick={() => this.viewHistory("back")}
+									>
+										<p className="button_font">&lt;</p>
+									</button> */}
+									<button className="reset_button" onClick={() => this.reset()}>
+										<p className="button_font">Restart Game</p>
+									</button>
+									{/* <button
+										className="reset_button history"
+										onClick={() => this.viewHistory("next")}
+									>
+										<p className="button_font">&gt;</p>
+									</button>
+									<button
+										className="reset_button history"
+										onClick={() => this.viewHistory("next_atw")}
+									>
+										<p className="button_font">&gt;&gt;</p>
+									</button> */}
+								</div>
 
-									<div className="button_wrapper">
-										{/* <button
-											className="reset_button history"
-											onClick={() => this.viewHistory("back_atw")}
-										>
-											<p className="button_font">&lt;&lt;</p>
-										</button>
-										<button
-											className="reset_button history"
-											onClick={() => this.viewHistory("back")}
-										>
-											<p className="button_font">&lt;</p>
-										</button> */}
-										<button className="reset_button" onClick={() => this.reset()}>
-											<p className="button_font">Restart Game</p>
-										</button>
-										{/* <button
-											className="reset_button history"
-											onClick={() => this.viewHistory("next")}
-										>
-											<p className="button_font">&gt;</p>
-										</button>
-										<button
-											className="reset_button history"
-											onClick={() => this.viewHistory("next_atw")}
-										>
-											<p className="button_font">&gt;&gt;</p>
-										</button> */}
-									</div>
-
-									<div className="mate_wrapper">
-										<p className="small_font">
-											{this.in_check("w", this.state.squares) &&
-													!this.checkmate("w", this.state.squares) === true
-													? "You are in check!"
-													: ""}
-										</p>
-										<p className="small_font">
-											{this.in_check("b", this.state.squares) &&
-													!this.checkmate("b", this.state.squares) === true
-													? "Black player is in check."
-													: ""}
-										</p>
-										<p className="small_font">
-											{this.checkmate("w", this.state.squares) === true
-													? "You lost by checkmate."
-													: ""}
-										</p>
-										<p className="small_font">
-											{this.checkmate("b", this.state.squares) === true
-													? "You won by checkmate!"
-													: ""}
-										</p>
-										<p className="small_font">
-											{(this.stalemate("w", this.state.squares) &&
-													this.state.turn === "w") === true
-													? "You are in stalemate. Game over."
-													: ""}
-										</p>
-										<p className="small_font">
-											{(this.stalemate("b", this.state.squares) &&
-													this.state.turn === "b") === true
-													? "Black is in stalemate. Game over."
-													: ""}
-										</p>
-									</div>
+								<div className="mate_wrapper">
+									<p className="small_font">
+										{this.in_check("w", this.state.squares) &&
+												!this.checkmate("w", this.state.squares) === true
+												? "White player is in check!"
+												: ""}
+									</p>
+									<p className="small_font">
+										{this.in_check("b", this.state.squares) &&
+												!this.checkmate("b", this.state.squares) === true
+												? "Black player is in check."
+												: ""}
+									</p>
+									<p className="small_font">
+										{this.checkmate("b", this.state.squares) === true
+												? "White player won by checkmate!"
+												: ""}
+									</p>
+									<p className="small_font">
+										{this.checkmate("w", this.state.squares) === true
+												? "Black player won by checkmate."
+												: ""}
+									</p>
+									<p className="small_font">
+										{(this.stalemate("w", this.state.squares) &&
+												this.state.turn === "w") === true
+												? "White player is in stalemate. Game over."
+												: ""}
+									</p>
+									<p className="small_font">
+										{(this.stalemate("b", this.state.squares) &&
+												this.state.turn === "b") === true
+												? "Black player is in stalemate. Game over."
+												: ""}
+									</p>
+								</div>
 							</div>
 						</div>
 					</div>
