@@ -969,84 +969,8 @@ class Board extends React.Component<any, IStateBoard> {
 			board.push(<div key={i}>{squareRows}</div>);
 		}
 
-		let black_mated = this.checkmate("b", this.state.squares);
-		let white_mated = this.checkmate("w", this.state.squares);
-		let stale =
-			(this.stalemate("w", this.state.squares) && this.state.turn === "w") ||
-			(this.stalemate("b", this.state.squares) && this.state.turn === "b");
-
 		return (
 			<div>
-					{this.state.move_made && !this.state.capture_made && (
-						<div>
-							<audio
-									ref="audio_tag"
-									src="./sfx/Move.mp3"
-									controls
-									autoPlay
-									hidden
-							/>{" "}
-						</div>
-					)}
-					{this.state.capture_made && not_history && (
-						<div>
-							<audio
-									ref="audio_tag"
-									src="./sfx/Capture.mp3"
-									controls
-									autoPlay
-									hidden
-							/>{" "}
-						</div>
-					)}
-					{black_mated && not_history && (
-						<div>
-							<audio
-									ref="audio_tag"
-									src="./sfx/Black_Defeat.mp3"
-									controls
-									autoPlay
-									hidden
-							/>{" "}
-						</div>
-					)}
-					{white_mated && not_history && (
-						<div>
-							<audio
-									ref="audio_tag"
-									src="./sfx/White_Defeat.mp3"
-									controls
-									autoPlay
-									hidden
-							/>{" "}
-						</div>
-					)}
-					{stale && not_history && (
-						<div>
-							<audio
-									ref="audio_tag"
-									src="./sfx/Stalemate.mp3"
-									controls
-									autoPlay
-									hidden
-							/>{" "}
-						</div>
-					)}
-					{this.state.check_flash &&
-						!(this.state.history_num - 1 !== this.state.turn_num) &&
-						!this.state.just_clicked && (
-							<div>
-									{" "}
-									<audio
-										ref="audio_tag"
-										src="./sfx/Check_Flash.mp3"
-										controls
-										autoPlay
-										hidden
-									/>{" "}
-							</div>
-						)}
-
 					<div className="main_container">
 						<div className="left_screen bounceInDown">
 							<div className="row_label"> {row_nums} </div>
