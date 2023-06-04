@@ -40,6 +40,7 @@ export interface IStateBoard {
 
 interface IBoardProps {
 	squareRenderer: SquareRenderer;
+	saver: Saver;
 }
 
 interface ISquaresSerialized {
@@ -53,14 +54,15 @@ export interface IStateSerialized extends Omit<IStateBoard, "squares"> {
 
 export default class Board extends React.Component<any, IStateBoard> {
 	private boardManager: BoardManager = new BoardManager();
-	private referee: Referee
-	private saver: Saver = new Saver();
-	private squareRenderer: SquareRenderer
-	private bot: Bot
-	private highlighter: Highlighter = new Highlighter()
+	private referee: Referee;
+	private saver: Saver;
+	private squareRenderer: SquareRenderer;
+	private bot: Bot;
+	private highlighter: Highlighter = new Highlighter();
 	constructor(props: IBoardProps) {
 		super(props);
 		this.squareRenderer = props.squareRenderer
+		this.saver = props.saver;
 		this.state = {
 			squares: this.boardManager.initializeBoard(),
 			source: -1,
@@ -345,7 +347,7 @@ export default class Board extends React.Component<any, IStateBoard> {
 					});
 				}, 200);
 
-				// Після того, як гравець зробив друге натискання і все ок, викликаємо бота, щоб той робив свій хід, передаємо глибину (execute_bot передає в minimax  depth - 1, щоб кожен раз змінювалась глибина, тому взагалі бот ходить на глибині 3, а шукає майбутні ходи до depth = 2 (тобто 2, 1, 0, тому дивиться на три ходи вперед)), до якої за допомогою minimax алгоритму буде робитися оцінка. Тобто бот дивиться на три ходи вперед
+				// виклик бота
 				if (this.state.bot_mode) {
 					let search_depth = 3;
 					setTimeout(() => {
@@ -441,7 +443,8 @@ export default class Board extends React.Component<any, IStateBoard> {
 				if (this.state.mated) square_cursor = "default";
 
 				squareRows.push(
-					this.squareRenderer.showSquare({key: i * 8 + j,
+					this.squareRenderer.showSquare({
+						key: i * 8 + j,
 						value: copy_squares[i * 8 + j],
 						color: square_color,
 						corner: square_corner,

@@ -6,9 +6,9 @@ export default class Saver {
 		const json = JSON.stringify({ ...object, squares: serializeSquares });
 		const blob = new Blob([json], { type: 'application/json' });
 
-		const fileReader = new FileReader();
-		fileReader.onloadend = () => {
-			const arrayBuffer = fileReader.result as ArrayBuffer;
+		const reader = new FileReader();
+		reader.onloadend = () => {
+			const arrayBuffer = reader.result as ArrayBuffer;
 			const dataView = new DataView(arrayBuffer);
 			const blobData = new Blob([dataView], { type: 'application/json' });
 
@@ -20,7 +20,7 @@ export default class Saver {
 				link.click();
 			}
 		};
-		fileReader.readAsArrayBuffer(blob);
+		reader.readAsArrayBuffer(blob);
 	}
 
 	private readFileAsObject(file: File, callback: (state: IStateSerialized) => void) {
