@@ -89,8 +89,8 @@ export default class Board extends React.Component<any, IStateBoard> {
 			just_clicked: false,
 			key: 0
 		};
-		this.referee = new Referee(this.state)
-		this.bot = new Bot(this.referee, this.state)
+		this.referee = new Referee()
+		this.bot = new Bot(this.referee)
 	}
 
 	reset() {
@@ -204,23 +204,23 @@ export default class Board extends React.Component<any, IStateBoard> {
 			copy_squares = this.highlighter.highlightMate(
 				"b",
 				copy_squares,
-				this.referee.checkmate("b", copy_squares),
-				this.referee.stalemate("b", copy_squares)
+				this.referee.checkmate("b", copy_squares, this.state),
+				this.referee.stalemate("b", copy_squares, this.state)
 			).slice();
 		} else {
 			copy_squares = this.highlighter.highlightMate(
 				"w",
 				copy_squares,
-				this.referee.checkmate("w", copy_squares),
-				this.referee.stalemate("w", copy_squares)
+				this.referee.checkmate("w", copy_squares, this.state),
+				this.referee.stalemate("w", copy_squares, this.state)
 			).slice();
 		}
 
 		let check_mated =
-			this.referee.checkmate("w", copy_squares) || this.referee.checkmate("b", copy_squares);
+			this.referee.checkmate("w", copy_squares, this.state) || this.referee.checkmate("b", copy_squares, this.state);
 		let stale_mated =
-			(this.referee.stalemate("w", copy_squares) && player === "b") ||
-			(this.referee.stalemate("b", copy_squares) && player === "w");
+			(this.referee.stalemate("w", copy_squares, this.state) && player === "b") ||
+			(this.referee.stalemate("b", copy_squares, this.state) && player === "w");
 
 		this.setState({
 			passant_pos: passant,
@@ -265,7 +265,7 @@ export default class Board extends React.Component<any, IStateBoard> {
 
 				// підсвічуємо куди можна піти
 				for (let j = 0; j < 64; j++) {
-					if (this.referee.pieceCanMoveThere(i, j, copy_squares))
+					if (this.referee.pieceCanMoveThere(i, j, copy_squares, this.state))
 						copy_squares[j].possible = 1;
 				}
 
@@ -294,7 +294,7 @@ export default class Board extends React.Component<any, IStateBoard> {
 				copy_squares = this.highlighter.clearPossibleMoveHighlight(copy_squares).slice();
 				// підсвічуємо ходи, які тепер можна зробити, після цього ходу
 				for (let j = 0; j < 64; j++) {
-					if (this.referee.pieceCanMoveThere(i, j, copy_squares))
+					if (this.referee.pieceCanMoveThere(i, j, copy_squares, this.state))
 						copy_squares[j].possible = 1;
 				}
 				// встановлюємо source на поле, на яке було натиснуто
@@ -305,7 +305,7 @@ export default class Board extends React.Component<any, IStateBoard> {
 				// рокіровка (або може є ще щось, не знаю)
 			} else {
 				// Якщо не можна зробити рокіровку (або може є ще щось, не знаю) то треба додати підсвітку і змінити певні пропси
-				if (!this.referee.pieceCanMoveThere(this.state.source, i, copy_squares)) {
+				if (!this.referee.pieceCanMoveThere(this.state.source, i, copy_squares, this.state)) {
 					// не підсвічуати поля, якщо обрано неможливий хід
 					copy_squares[this.state.source].highlight = 0;
 					copy_squares = this.highlighter.clearPossibleMoveHighlight(copy_squares).slice();
@@ -313,7 +313,7 @@ export default class Board extends React.Component<any, IStateBoard> {
 					if (
 						// означає, що друге натиснення і король під шахом
 						i !== this.state.source &&
-						this.referee.inCheck(this.state.turn, copy_squares) === true
+						this.referee.inCheck(this.state.turn, copy_squares, this.state) === true
 					) {
 						for (let j = 0; j < 64; j++) {
 							if ((this.state.turn === "w" && copy_squares[j].id === "k")
@@ -356,7 +356,8 @@ export default class Board extends React.Component<any, IStateBoard> {
 							this.state.squares, 
 							this.state.mated,
 							this.state.first_pos,
-							this.state.second_pos, 
+							this.state.second_pos,
+							this.state, 
 							this.movePiece.bind(this));
 					}, 700);
 				}
@@ -552,35 +553,35 @@ export default class Board extends React.Component<any, IStateBoard> {
 
 							<div className="mate_wrapper">
 								<p className="small_font">
-									{this.referee.inCheck("w", this.state.squares) &&
-										!this.referee.checkmate("w", this.state.squares) === true
+									{this.referee.inCheck("w", this.state.squares, this.state) &&
+										!this.referee.checkmate("w", this.state.squares, this.state) === true
 										? "White player is in check!"
 										: ""}
 								</p>
 								<p className="small_font">
-									{this.referee.inCheck("b", this.state.squares) &&
-										!this.referee.checkmate("b", this.state.squares) === true
+									{this.referee.inCheck("b", this.state.squares, this.state) &&
+										!this.referee.checkmate("b", this.state.squares, this.state) === true
 										? "Black player is in check."
 										: ""}
 								</p>
 								<p className="small_font">
-									{this.referee.checkmate("b", this.state.squares) === true
+									{this.referee.checkmate("b", this.state.squares, this.state) === true
 										? "White player won by checkmate!"
 										: ""}
 								</p>
 								<p className="small_font">
-									{this.referee.checkmate("w", this.state.squares) === true
+									{this.referee.checkmate("w", this.state.squares, this.state) === true
 										? "Black player won by checkmate."
 										: ""}
 								</p>
 								<p className="small_font">
-									{(this.referee.stalemate("w", this.state.squares) &&
+									{(this.referee.stalemate("w", this.state.squares, this.state) &&
 										this.state.turn === "w") === true
 										? "White player is in stalemate. Game over."
 										: ""}
 								</p>
 								<p className="small_font">
-									{(this.referee.stalemate("b", this.state.squares) &&
+									{(this.referee.stalemate("b", this.state.squares, this.state) &&
 										this.state.turn === "b") === true
 										? "Black player is in stalemate. Game over."
 										: ""}

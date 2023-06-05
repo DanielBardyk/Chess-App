@@ -9,7 +9,7 @@ export default class Bot extends Player {
 	protected pieceEvaluator: PieceEvaluator = new PieceEvaluator()
 	private botEngine: BotEngine = new BotEngine(this.referee, this.pieceEvaluator)
 
-	constructor(private referee: Referee, private state: IStateBoard) {
+	constructor(private referee: Referee) {
 		super()
 		this.repetition = 0
 	}
@@ -28,6 +28,7 @@ export default class Bot extends Player {
 		mated: boolean,
 		firstPos: number,
 		secondPos: number,
+		boardState: IStateBoard,
 		movePiece: (player: "b" | "w", squares: PieceType[], start: number, end: number) => void
 		)
 		{
@@ -65,7 +66,7 @@ export default class Bot extends Player {
 					// беремо кінцеве поле (квадрат)
 					let end = RA_of_ends[j];
 					// перевіряємо чи можна походити з поля "A" на поле "B"
-					if (this.referee.pieceCanMoveThere(start, end, copy_squares) === true) {
+					if (this.referee.pieceCanMoveThere(start, end, copy_squares, boardState) === true) {
 						// якщо можна, додаємо поля "A" та "B"
 						moves.push(start);
 						moves.push(end);
@@ -98,7 +99,7 @@ export default class Bot extends Player {
 			} else {
 				const test_squares = passed_in_squares.slice();
 				// робимо хід
-				const test_squares_2 = this.makePossibleMove(test_squares, start, end, this.state.passant_pos).slice();
+				const test_squares_2 = this.makePossibleMove(test_squares, start, end, boardState.passant_pos).slice();
 				// для взяття на проході
 				var passant_pos = 65;
 				if (
