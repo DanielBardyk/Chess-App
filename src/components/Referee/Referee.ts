@@ -2,7 +2,6 @@ import { IStateBoard, PieceType } from "../Board/Board";
 import { PieceFiller, Queen } from "../Pieces/Pieces";
 
 export default class Referee {
-	constructor() {}
 
 	private goodPawn(start: number, end: number, squares: PieceType[], boardState: IStateBoard, passant_pos: number | null = null) {
 		var passant = passant_pos === null ? boardState.passant_pos : passant_pos;
@@ -48,7 +47,6 @@ export default class Referee {
 
 		return true;
 	}
-
 
 	private isMoveInvalid(start: number, end: number, squares: PieceType[], boardState: IStateBoard, passant_pos: number | null = null) {
 		const copy_squares: PieceType[] = squares.slice();
