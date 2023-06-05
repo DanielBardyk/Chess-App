@@ -5,22 +5,13 @@ export default class Saver {
 		const serializeSquares = object.squares.map(square => ({ name: square.constructor.name, player: square.player }))
 		const json = JSON.stringify({ ...object, squares: serializeSquares });
 		const blob = new Blob([json], { type: 'application/json' });
-
-		const reader = new FileReader();
-		reader.onloadend = () => {
-			const arrayBuffer = reader.result as ArrayBuffer;
-			const dataView = new DataView(arrayBuffer);
-			const blobData = new Blob([dataView], { type: 'application/json' });
-
 			const link = document.createElement('a');
-			link.href = URL.createObjectURL(blobData);
-			const name = prompt('Enter the file name')
+			link.href = window.URL.createObjectURL(blob);
+			const name = prompt('Enter file name')
 			if (name) {
 				link.download = name
 				link.click();
 			}
-		};
-		reader.readAsArrayBuffer(blob);
 	}
 
 	private readFileAsObject(file: File, callback: (state: IStateSerialized) => void) {

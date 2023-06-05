@@ -300,19 +300,19 @@ a:active {
 }
 
 .selected_white_square {
-  background-color: #00e686;
+  background-color: #ffbe3ccf;
 }
 
 .selected_black_square {
-  background-color: #00c070;
+  background-color: #ffbe3ccf;
 }
 
 .highlighted_white_square {
-  background-color: #94fffe;
+  background-color: #ffbe3ccf;
 }
 
 .highlighted_black_square {
-  background-color: #77e1d7;
+  background-color: #ffbe3ccf;
 }
 
 .in_check_square_white {
@@ -322,14 +322,14 @@ a:active {
 
 .in_check_square_black {
   animation: flash-black 0.5s;
-  background-color: #034f84;
+  background-color: #b6821bcf;
 }
 
 .checked_square {
-  background-color: #ff4233;
+  background-color: #9d3d36;
 }
 
-@-webkit-keyframes flash-white {
+@keyframes flash-white {
   from,
   50%,
   to {
@@ -342,7 +342,7 @@ a:active {
   }
 }
 
-@-webkit-keyframes flash-black {
+@keyframes flash-black {
   from,
   50%,
   to {
