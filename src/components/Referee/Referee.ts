@@ -190,7 +190,7 @@ export default class Referee {
 		if (this.inCheck(player as "w" | "b", check_squares, boardState) === true) return false;
 
 		return true;
-	}	
+	}
 
 	public stalemate(player: "w" | "b", squares: PieceType[], boardState: IStateBoard) {
 		if (this.inCheck(player, squares, boardState)) return false;
