@@ -1,4 +1,4 @@
-import { PieceType } from "../Board/Board";
+import { IStateBoard, PieceType } from "../Board/Board";
 import PieceEvaluator from "../PieceEvaluator/PieceEvaluator";
 import Referee from "../Referee/Referee";
 
@@ -16,11 +16,12 @@ export default class BotEngine {
 		is_black_player: boolean,
 		alpha: number, // поточне найкраще значення, яке може досягти чорний гравець, який максимізує (для альфа-бета відсікання)
 		beta: number, // поточне найкраще значення, яке може досягти білий гравець, який мінімізує (для альфа-бета відсікання)
-		squares: any[], // приймаємо стан шахової дошки після виконання ходу
-		RA_of_starts: any[],
-		RA_of_ends: any[],
-		passant_pos: any,
-		makePossibleMove: (squares: PieceType[], start: number, end: number, statePassantPos: number, passant_pos?: null) => PieceType[]
+		squares: PieceType[], // приймаємо стан шахової дошки після виконання ходу
+		RA_of_starts: number[],
+		RA_of_ends: number[],
+		passant_pos: number | null,
+		boardState: IStateBoard,
+		makePossibleMove: (squares: PieceType[], start: number, end: number, statePassantPos: number, passant_pos?: number | null) => PieceType[]
 	) {
 		const copy_squares = squares.slice();
 
@@ -35,7 +36,7 @@ export default class BotEngine {
 			let start = RA_of_starts[i];
 			// перевірка, чи є на полі фігура
 			let isPlayerPiece =
-				copy_squares[start].ascii !== null && copy_squares[start].player === (is_black_player ? "b" : "w");
+				copy_squares[start].id !== null && copy_squares[start].player === (is_black_player ? "b" : "w");
 
 			// якщо поле не пусте, то
 			if (isPlayerPiece) {
@@ -43,13 +44,14 @@ export default class BotEngine {
 				for (let j = 0; j < 64; j++) {
 					let end = RA_of_ends[j];
 					if ( // якщо можна зробити хід з поля start на поле end
-						this.referee.pieceCanMoveThere(start, end, copy_squares, passant_pos) === true
+						this.referee.pieceCanMoveThere(start, end, copy_squares, boardState, passant_pos) === true
 					) { // робимо хід. Метод make_possible_move повертає стан дошки після зробленого ходу
 						const test_squares = squares.slice()
 						const test_squares_2 = makePossibleMove(
 							test_squares,
 							start,
 							end,
+							boardState.passant_pos,
 							passant_pos
 						).slice()
 						// перевіряє, чи зроблений хід є взяттям на проході. Це треба для ф-ії pieceCanMove_there (без цього вона б оцінювала взяття на прохід як неможливий хід).
@@ -57,7 +59,7 @@ export default class BotEngine {
 						var passant = 65;
 						// якщо цей хід був взяттям на проході, то passant = end
 						if (
-							test_squares[end].ascii === (is_black_player ? "P" : "p") &&
+							test_squares[end].id === (is_black_player ? "P" : "p") &&
 							start >= (is_black_player ? 8 : 48) &&
 							start <= (is_black_player ? 15 : 55) &&
 							end - start === (is_black_player ? 16 : -16)
@@ -75,6 +77,7 @@ export default class BotEngine {
 							RA_of_starts,
 							RA_of_ends,
 							passant,
+							boardState,
 							makePossibleMove
 						);
 						// чорний гравець максимізує значення, білий гравець мінімізує значення

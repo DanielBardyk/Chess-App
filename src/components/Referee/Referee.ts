@@ -4,7 +4,7 @@ import { PieceFiller, Queen } from "../Pieces/Pieces";
 export default class Referee {
 	constructor() {}
 
-	private goodPawn(start: number, end: number, squares: PieceType[], boardState: IStateBoard, passant_pos=null) {
+	private goodPawn(start: number, end: number, squares: PieceType[], boardState: IStateBoard, passant_pos: number | null = null) {
 		var passant = passant_pos === null ? boardState.passant_pos : passant_pos;
 		var start_row = 8 - Math.floor(start / 8);
 		var start_col = (start % 8) + 1;
@@ -50,7 +50,7 @@ export default class Referee {
 	}
 
 
-	private isMoveInvalid(start: number, end: number, squares: PieceType[], boardState: IStateBoard, passant_pos=null) {
+	private isMoveInvalid(start: number, end: number, squares: PieceType[], boardState: IStateBoard, passant_pos: number | null = null) {
 		const copy_squares: PieceType[] = squares.slice();
 		var bqrpk =
 			copy_squares[start].id?.toLowerCase() === "r" ||
@@ -148,7 +148,7 @@ export default class Referee {
 		return false;
 	}
 	
-	public pieceCanMoveThere(start: number, end: number, squares: PieceType[], boardState: IStateBoard, passant_pos = null) {
+	public pieceCanMoveThere(start: number, end: number, squares: PieceType[], boardState: IStateBoard, passant_pos: number | null = null) {
 		const copy_squares = squares.slice();
 		if (start === end)
 			return false;

@@ -14,7 +14,7 @@ export default class Bot extends Player {
 		this.repetition = 0
 	}
 
-	private shuffle(passed_in_array: any) {
+	private shuffle(passed_in_array: number[]) {
 		const array = passed_in_array.slice();
 		for (let i = array.length - 1; i > 0; i--) {
 			let j = Math.floor(Math.random() * (i + 1));
@@ -119,6 +119,7 @@ export default class Bot extends Player {
 					RA_of_starts,
 					RA_of_ends,
 					passant_pos,
+					boardState,
 					this.makePossibleMove
 				);
 				// якщо цей хід краще ніж попередні, то best_value дорівнює цьому ходу й беремо його початкові й кінцеву позиції
