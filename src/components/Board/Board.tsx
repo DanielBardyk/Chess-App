@@ -435,7 +435,7 @@ export default class Board extends React.Component<any, IStateBoard> {
 				}
 
 				const copy_squares = this.state.squares.slice();
-				let square_color = this.boardManager.calc_squareColor(i, j, copy_squares);
+				let square_color = this.boardManager.calcSquareColor(i, j, copy_squares);
 				let square_cursor = "pointer";
 				if (this.state.turn === copy_squares[i * 8 + j].player && !this.state.bot_running) square_cursor = "pointer"
 				else square_cursor = "default"

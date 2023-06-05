@@ -335,11 +335,6 @@ a:active {
   to {
     background-color: #ff4233;
   }
-
-  25%,
-  75% {
-    background-color: #deeaee;
-  }
 }
 
 @keyframes flash-black {
@@ -347,11 +342,6 @@ a:active {
   50%,
   to {
     background-color: #ff4233;
-  }
-
-  25%,
-  75% {
-    background-color: #034f84;
   }
 }
 

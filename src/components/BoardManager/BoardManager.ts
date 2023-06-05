@@ -1,3 +1,4 @@
+import { PieceType } from "../Board/Board";
 import { Pawn, King, Queen, Bishop, Knight, Rook, PieceFiller } from "../Pieces/Pieces"
 
 export default class BoardManager {
@@ -48,7 +49,7 @@ export default class BoardManager {
 		return value % 2;
 	}
 
-	public calcSquareColor(i: number, j: number, squares: any[]) {
+	public calcSquareColor(i: number, j: number, squares: PieceType[]) {
 		let square_color =
 			(this.isEven(i) && this.isEven(j)) || (!this.isEven(i) && !this.isEven(j))
 			? "white_square"
@@ -66,18 +67,17 @@ export default class BoardManager {
 				: "highlighted_black_square";
 		}
 		if (
-			squares[i * 8 + j].ascii != null &&
-			squares[i * 8 + j].ascii.toLowerCase() === "k"
+			squares[i * 8 + j].id != null &&
+			(squares[i * 8 + j].id as string).toLowerCase() === "k"
 		) {
-			if (squares[i * 8 + j].in_check === 1) {
+			if ((squares[i * 8 + j] as King).inCheck === 1) {
 			square_color =
 				(this.isEven(i) && this.isEven(j)) || (!this.isEven(i) && !this.isEven(j))
 					? "in_check_square_white"
 					: "in_check_square_black";
 			}
-			if (squares[i * 8 + j].checked >= 1) {
-			square_color =
-				squares[i * 8 + j].checked === 1 ? "checked_square" : "stale_square";
+			if ((squares[i * 8 + j] as King).checked >= 1) {
+				square_color = (squares[i * 8 + j] as King).checked === 1 ? "checked_square" : "stale_square";
 			}
 		}
 		return square_color;
