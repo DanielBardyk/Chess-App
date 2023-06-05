@@ -9,8 +9,6 @@ export default class PieceEvaluator {
 		let pieceValue = 0;
 		if (piece.id === null) return 0;
 	 
-		// these arrays help adjust the piece's value
-		// depending on where the piece is on the board
 		var pawnEvalWhite = [
 		  [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0],
 		  [5.0, 5.0, 5.0, 5.0, 5.0, 5.0, 5.0, 5.0],
