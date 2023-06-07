@@ -29,7 +29,9 @@ export interface IStateBoard {
 	passant_pos: number,
 	bot_running: number,
 	game_started: boolean,
-	bot_mode: boolean,
+	pieces_selection: boolean,
+	mode_choosed: boolean,
+	against_bot: boolean,
 	mated: boolean,
 	move_made: boolean,
 	capture_made: boolean,
@@ -64,7 +66,7 @@ export default class Board extends React.Component<any, IStateBoard> {
 		this.squareRenderer = props.squareRenderer
 		this.saver = props.saver;
 		this.state = {
-			squares: this.boardManager.initializeBoard(),
+			squares: this.boardManager.initializeEmptyBoard(),
 			source: -1,
 			turn: "w",
 			true_turn: "w",
@@ -81,7 +83,9 @@ export default class Board extends React.Component<any, IStateBoard> {
 			passant_pos: 65,
 			bot_running: 0,
 			game_started: false,
-			bot_mode: false,
+			pieces_selection: false,
+			mode_choosed: false,
+			against_bot: false,
 			mated: false,
 			move_made: false,
 			capture_made: false,
@@ -95,7 +99,7 @@ export default class Board extends React.Component<any, IStateBoard> {
 
 	reset() {
 		if (
-			this.state.bot_mode
+			this.state.against_bot
 			&& this.state.turn === "b"
 			&& !this.state.mated
 		)
@@ -119,7 +123,9 @@ export default class Board extends React.Component<any, IStateBoard> {
 			passant_pos: 65,
 			bot_running: 0,
 			game_started: false,
-			bot_mode: false,
+			pieces_selection: false,
+			mode_choosed: false,
+			against_bot: false,
 			mated: false,
 			move_made: false,
 			capture_made: false,
@@ -132,12 +138,10 @@ export default class Board extends React.Component<any, IStateBoard> {
 	movePiece(player: "w" | "b", squares: PieceType[], start: number, end: number) {
 		let copy_squares = squares.slice();
 
-		// clear highlights
 		copy_squares = this.highlighter.clearHighlight(copy_squares).slice();
-		if (!(this.state.bot_mode && player === "b")) {
+		if (!(this.state.against_bot && player === "b")) {
 			copy_squares = this.highlighter.clearPossibleMoveHighlight(copy_squares).slice();
 			for (let j = 0; j < 64; j++) {
-				// user has heeded warning
 				if (copy_squares[start].id === (player === "w" ? "k" : "K")) {
 					let king = copy_squares[j] as King;
 					king.inCheck = 0;
@@ -230,7 +234,7 @@ export default class Board extends React.Component<any, IStateBoard> {
 			mated: check_mated || stale_mated ? true : false,
 			turn: player === "b" ? "w" : "b",
 			true_turn: player === "b" ? "w" : "b",
-			bot_running: (this.state.bot_mode && player === "w") ? 1 : 0,
+			bot_running: (this.state.against_bot && player === "w") ? 1 : 0,
 			move_made: true,
 		});
 	}
@@ -348,7 +352,7 @@ export default class Board extends React.Component<any, IStateBoard> {
 				}, 200);
 
 				// виклик бота
-				if (this.state.bot_mode) {
+				if (this.state.against_bot) {
 					let search_depth = 3;
 					setTimeout(() => {
 						this.bot.execute_bot(
@@ -463,9 +467,13 @@ export default class Board extends React.Component<any, IStateBoard> {
 			<div>
 				<div className="main_container">
 					<div className="left_screen bounceInDown">
+						{ this.state.pieces_selection &&
+							<div className="black_panel">{this.boardManager.addPiecesToChooseForTraining("b")}</div> }
 						<div className="row_label"> {row_nums} </div>
 						<div className="table"> {board} </div>
 						<div className="col_label"> {col_nums} </div>
+						{ this.state.pieces_selection &&
+							<div className="white_panel">{this.boardManager.addPiecesToChooseForTraining("w")}</div> }
 					</div>
 
 					<div className="right_screen bounceInDown">
@@ -499,25 +507,51 @@ export default class Board extends React.Component<any, IStateBoard> {
 
 							<div className="button_wrapper">
 								<div className="mode_restart">
-									{!this.state.game_started &&
+									{!this.state.mode_choosed &&
 										<>
 											<button
-												className="button mode_bot"
+											className="button all_pieces"
+											onClick={() => {
+												this.setState({
+													mode_choosed: true
+												})
+											}}
+											>
+												<p className="button_font">All pieces</p>
+											</button>
+											<button
+											className="button choose_pieces"
+											onClick={() => {
+												this.setState({
+													pieces_selection: true,
+													mode_choosed: true
+												})
+											}}
+											>
+												<p className="button_font">Choose pieces</p>
+											</button>
+										</>
+									}
+									{this.state.mode_choosed && !this.state.game_started &&
+										<>
+											<button
+												className="button against_bot"
 												onClick={() => {
 													this.setState({
-														game_started: true,
-														bot_mode: true
+														against_bot: true,
+														game_started: true
 													})
 												}}
 											>
 												<p className="button_font">Against Bot</p>
 											</button>
 											<button
-												className="button mode_two"
+												className="button two_players"
 												onClick={() => {
 													this.setState({
-														game_started: true,
-														bot_mode: false
+														against_bot: false,
+														pieces_selection: false,
+														game_started: true
 													})
 												}}
 											>
@@ -551,7 +585,7 @@ export default class Board extends React.Component<any, IStateBoard> {
 								</div>
 							</div>
 
-							<div className="mate_wrapper">
+							{ this.state.game_started && <div className="mate_wrapper">
 								<p className="small_font">
 									{this.referee.inCheck("w", this.state.squares, this.state) &&
 										!this.referee.checkmate("w", this.state.squares, this.state) === true
@@ -586,7 +620,7 @@ export default class Board extends React.Component<any, IStateBoard> {
 										? "Black player is in stalemate. Game over."
 										: ""}
 								</p>
-							</div>
+							</div> }
 						</div>
 					</div>
 				</div>

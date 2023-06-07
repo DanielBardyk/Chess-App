@@ -1,0 +1,22 @@
+import React from "react";
+import { PieceType } from "../Board/Board";
+
+interface TrainingPieceProps {
+	key: number,
+	imageSrc: string, 
+	piece: PieceType,
+	player: "w" | "b",
+}
+
+export default class TrainingPiece {
+	public createLinkToPiece(props: TrainingPieceProps) {
+		return (
+			<img>
+				key={props.key}
+				src={props.imageSrc}
+				alt={"Chess piece"}
+				
+			</img>
+		)
+	}
+}
