@@ -1,7 +1,6 @@
 import { Square } from "../Square/Square";
-class SquareRenderer {
-	showSquare(props: any) {
+export default class SquareRenderer {
+	public showSquare(props: any) {
 		return <Square {...props} />;
 	}
 }
-export default SquareRenderer
