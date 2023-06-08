@@ -1,8 +1,10 @@
-export function Square(props: any) {
+import { ISquareProps } from "../SquareRenderer/SquareRenderer";
+
+export function Square(props: ISquareProps) {
 	if (props.value != null) {
 		return (
 			<button
-				className={"square " + props.color + props.corner + props.cursor}
+				className={props.size + props.color + props.corner + props.cursor}
 				onClick={props.onClick}
 			>
 				{props.value.icon}
@@ -11,7 +13,7 @@ export function Square(props: any) {
 	} else {
 		return (
 			<button
-				className={"square " + props.color + props.corner + props.cursor}
+				className={props.size + props.color + props.corner + props.cursor}
 				onClick={props.onClick}
 			>
 				{" "}
