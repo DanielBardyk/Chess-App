@@ -1,3 +1,3 @@
 export default function Label(props: any) {
-	return <button className={"label"}> {props.value} </button>;
+	return <button className={props.size}> {props.value} </button>;
 }

@@ -3,6 +3,8 @@ import { PieceCleaner } from "../PieceCleaner/PieceCleaner";
 import { Pawn, King, Queen, Bishop, Knight, Rook, PieceFiller } from "../Pieces/Pieces"
 import SquareRenderer from "../SquareRenderer/SquareRenderer";
 
+export type PanelType = King | Queen | Bishop | Knight | Rook | PieceCleaner
+
 export default class BoardManager {
 
 	public initializeEmptyBoard() {
@@ -55,39 +57,11 @@ export default class BoardManager {
 		return squares;
 	}
 
-	public addPiecesToChooseForTraining(player: "w" | "b") {
-		const training_pieces_white: JSX.Element[] = this.createTrainingPiecesArray(player);
-
-		return training_pieces_white;
-	}
-
-	private createTrainingPiecesArray(player: "w" | "b") {
-		const squareRenderer = new SquareRenderer();
-		const training_pieces_array = Array(7).fill(null);
-		const panel_elements = [new King(player), new Queen(player), new Rook(player), new Bishop(player), 
-			new Knight(player), new Pawn(player), new PieceCleaner(player)];	
-		let square_corner;
-
-		for (let i=0; i < panel_elements.length; i++) {
-			if (i === 0 && player === "w") square_corner = " bottom_left_square ";
-			else if (i === 6 && player === "w") square_corner = " bottom_right_square ";
-			else if (i === 0 && player === "b") square_corner = " top_left_square ";
-			else if (i === 6 && player === "b") square_corner = " top_right_square ";
-			else square_corner = " "
-
-			training_pieces_array[i] = squareRenderer.showSquare({
-				key: i,
-				value: panel_elements[i],
-				color: "training_piece_square",
-				corner: square_corner,
-				cursor: "pointer",
-				/* onClick: () => {
-					this.handlePieceChoose()
-				}}) */
-			})
-		}
-
-		return training_pieces_array;
+	public createTrainingPiecesArray(player: "w" | "b") {
+		const panel_elements: PanelType[] = [new King(player), new Queen(player), new Rook(player), new Bishop(player), 
+			new Knight(player), new Pawn(player), new PieceCleaner(player)];
+			
+		return panel_elements;
 	}
 
 	private isEven(value: number) {

@@ -2,7 +2,7 @@ import React from "react";
 import Label from "../Label/Label";
 import { Pawn, King, Queen, Bishop, Knight, Rook, PieceFiller } from "../Pieces/Pieces"
 import Saver from "../Saver/Saver";
-import BoardManager from "../BoardManager/BoardManager";
+import BoardManager, { PanelType } from "../BoardManager/BoardManager";
 import Highlighter from "../Highlighter/Highlighter";
 import SquareRenderer from "../SquareRenderer/SquareRenderer";
 import Referee from "../Referee/Referee";
@@ -13,6 +13,9 @@ export type PieceType = Pawn | King | Queen | Bishop | Knight | Rook | PieceFill
 
 export interface IStateBoard {
 	squares: PieceType[],
+	black_panel: PanelType[],
+	white_panel: PanelType[],
+	selected_piece: PanelType | null;
 	source: number,
 	turn: "w" | "b",
 	true_turn: "w" | "b",
@@ -61,12 +64,16 @@ export default class Board extends React.Component<any, IStateBoard> {
 	private squareRenderer: SquareRenderer;
 	private bot: Bot;
 	private highlighter: Highlighter = new Highlighter();
+
 	constructor(props: IBoardProps) {
 		super(props);
 		this.squareRenderer = props.squareRenderer
 		this.saver = props.saver;
 		this.state = {
 			squares: this.boardManager.initializeEmptyBoard(),
+			black_panel: [],
+			white_panel: [],
+			selected_piece: null,
 			source: -1,
 			turn: "w",
 			true_turn: "w",
@@ -106,7 +113,7 @@ export default class Board extends React.Component<any, IStateBoard> {
 			return "cannot reset";
 
 		this.setState({
-			squares: this.boardManager.initializeBoard(),
+			squares: this.boardManager.initializeEmptyBoard(),
 			source: -1,
 			turn: "w",
 			true_turn: "w",
@@ -238,11 +245,98 @@ export default class Board extends React.Component<any, IStateBoard> {
 			move_made: true,
 		});
 	}
+
+	loadState(state: IStateSerialized) {
+		const deserializedSquares = state.squares.map((classSquare) => {
+			if (classSquare.player) {
+				if (classSquare.name === 'Pawn') return new Pawn(classSquare.player)
+				else if (classSquare.name === 'King') return new King(classSquare.player)
+				else if (classSquare.name === 'Queen') return new Queen(classSquare.player)
+				else if (classSquare.name === 'Bishop') return new Bishop(classSquare.player)
+				else if (classSquare.name === 'Knight') return new Knight(classSquare.player)
+				else return new Rook(classSquare.player)
+			}
+			else return new PieceFiller()
+		})
+		this.setState({ ...state, squares: deserializedSquares })
+	}
+
+	handlePieceChoose(piece: PanelType) {
+		if (this.state.selected_piece === piece) {
+			this.setState({
+				selected_piece: null
+			})
+		} else {
+			this.setState({
+				selected_piece: piece
+			})
+		}
+	}
+
+	calcColorTrainingPiece(piece: PanelType) {
+		if(this.state.selected_piece === piece) {
+			return "selected_white_square "
+		} else {
+			return "training_piece_square "
+		}
+		
+	}
+
+	renderPanel(player: "w" | "b") {
+		let square_corner;
+		const panel_elements = player === "w" ? this.state.white_panel : this.state.black_panel; 
+		let pieces_array: JSX.Element[] = [];
+
+		for (let i=0; i < 7; i++) {
+			if (i === 0 && player === "w") square_corner = " bottom_left_square ";
+			else if (i === 6 && player === "w") square_corner = " bottom_right_square ";
+			else if (i === 0 && player === "b") square_corner = " top_left_square ";
+			else if (i === 6 && player === "b") square_corner = " top_right_square ";
+			else square_corner = " "
+
+			pieces_array.push(
+				this.squareRenderer.showSquare({
+					key: i,
+					value: panel_elements[i],
+					size: "square_piece_selection ",
+					color: this.calcColorTrainingPiece(panel_elements[i]),
+					corner: square_corner,
+					cursor: "pointer",
+					onClick: () => {
+						this.handlePieceChoose(panel_elements[i])
+					}
+				})
+			)
+		}
+		return pieces_array;
+	}
 	
 	// обробка натиснення гравця на поле на дошці
 	handleClick(i: number) {
 
 		let copy_squares = this.state.squares.slice();
+
+		console.log(this.state.selected_piece?.id, copy_squares[i].player, this.state.selected_piece?.player)
+
+		if(this.state.pieces_selection) {
+			if (!this.state.selected_piece) return
+			else if (this.state.selected_piece.id === "c" && copy_squares[i].player === this.state.selected_piece.player) {
+				copy_squares[i] = new PieceFiller();
+			} 
+			else if (copy_squares.find(p => p.id?.toLowerCase() === "k"
+				&& this.state.selected_piece?.id?.toLowerCase() === "k"
+				&& p.player === this.state.selected_piece.player
+				)) {
+					return
+				}
+				
+			if(this.state.selected_piece.id !== "c") copy_squares[i] = this.state.selected_piece as PieceType;
+
+			this.setState({
+				squares: copy_squares,
+			});
+			return
+		}
 
 		// кінець гри
 		if (this.state.mated) return "game-over";
@@ -368,26 +462,12 @@ export default class Board extends React.Component<any, IStateBoard> {
 			}
 		}
 	}
-	
-	loadState(state: IStateSerialized) {
-		const deserializedSquares = state.squares.map((classSquare) => {
-			if (classSquare.player) {
-				if (classSquare.name === 'Pawn') return new Pawn(classSquare.player)
-				else if (classSquare.name === 'King') return new King(classSquare.player)
-				else if (classSquare.name === 'Queen') return new Queen(classSquare.player)
-				else if (classSquare.name === 'Bishop') return new Bishop(classSquare.player)
-				else if (classSquare.name === 'Knight') return new Knight(classSquare.player)
-				else return new Rook(classSquare.player)
-			}
-			else return new PieceFiller()
-		})
-		this.setState({ ...state, squares: deserializedSquares })
-	}
 
 	render() {
 		const row_nums = [];
+		const label_class = this.state.pieces_selection ? "label_piece_selection" : "label";
 		for (let i = 8; i > 0; i--) {
-			row_nums.push(<Label key={i} value={i} />);
+			row_nums.push(<Label key={i} value={i} size={label_class} />);
 		}
 		const col_nums = [];
 		for (let i = 1; i < 9; i++) {
@@ -418,7 +498,7 @@ export default class Board extends React.Component<any, IStateBoard> {
 					letter = "H";
 					break;
 			}
-			col_nums.push(<Label key={letter} value={letter} />);
+			col_nums.push(<Label key={letter} value={letter} size={label_class} />);
 		}
 
 		const board = [];
@@ -446,21 +526,36 @@ export default class Board extends React.Component<any, IStateBoard> {
 				if (this.state.bot_running === 1 && !this.state.mated)
 					square_cursor = "bot_running";
 				if (this.state.mated) square_cursor = "default";
+				if(this.state.pieces_selection) square_cursor = "pointer"
+
+				let square_size = this.state.pieces_selection ? "square_piece_selection " : "square ";
 
 				squareRows.push(
 					this.squareRenderer.showSquare({
 						key: i * 8 + j,
 						value: copy_squares[i * 8 + j],
+						size: square_size,
 						color: square_color,
 						corner: square_corner,
 						cursor: square_cursor,
 						onClick: () => {
-							this.state.game_started &&
-							this.handleClick(i * 8 + j)
+							if (this.state.game_started || this.state.pieces_selection) {
+								this.handleClick(i * 8 + j);
+							}
 						}})
 				);
 			}
 			board.push(<div key={i}>{squareRows}</div>);
+		}
+
+		let table_class = "table";
+		let col_class = "col_label";
+		let row_class = "row_label"
+
+		if (this.state.pieces_selection) {
+			table_class = "table_piece_selection";
+			col_class = "col_label_piece_selection";
+			row_class = "row_label_piece_selection";
 		}
 
 		return (
@@ -468,12 +563,12 @@ export default class Board extends React.Component<any, IStateBoard> {
 				<div className="main_container">
 					<div className="left_screen bounceInDown">
 						{ this.state.pieces_selection &&
-							<div className="black_panel">{this.boardManager.addPiecesToChooseForTraining("b")}</div> }
-						<div className="row_label"> {row_nums} </div>
-						<div className="table"> {board} </div>
-						<div className="col_label"> {col_nums} </div>
+							<div className="black_panel">{this.renderPanel("b")}</div> }
+						<div className={ row_class }> {row_nums} </div>
+						<div className={ table_class }> {board} </div>
+						<div className={col_class}> {col_nums} </div>
 						{ this.state.pieces_selection &&
-							<div className="white_panel">{this.boardManager.addPiecesToChooseForTraining("w")}</div> }
+							<div className="white_panel">{this.renderPanel("w")}</div> }
 					</div>
 
 					<div className="right_screen bounceInDown">
@@ -513,7 +608,8 @@ export default class Board extends React.Component<any, IStateBoard> {
 											className="button all_pieces"
 											onClick={() => {
 												this.setState({
-													mode_choosed: true
+													mode_choosed: true,
+													squares: this.boardManager.initializeBoard()
 												})
 											}}
 											>
@@ -524,7 +620,9 @@ export default class Board extends React.Component<any, IStateBoard> {
 											onClick={() => {
 												this.setState({
 													pieces_selection: true,
-													mode_choosed: true
+													mode_choosed: true,
+													black_panel: this.boardManager.createTrainingPiecesArray("b"),
+													white_panel: this.boardManager.createTrainingPiecesArray("w"),
 												})
 											}}
 											>
@@ -539,6 +637,8 @@ export default class Board extends React.Component<any, IStateBoard> {
 												onClick={() => {
 													this.setState({
 														against_bot: true,
+														pieces_selection: false,
+														selected_piece: null,
 														game_started: true
 													})
 												}}
@@ -551,6 +651,7 @@ export default class Board extends React.Component<any, IStateBoard> {
 													this.setState({
 														against_bot: false,
 														pieces_selection: false,
+														selected_piece: null,
 														game_started: true
 													})
 												}}
@@ -580,7 +681,7 @@ export default class Board extends React.Component<any, IStateBoard> {
 										key: prevState.key + 1,
 									}));
 
-									this.saver.handleLoadFile(e, this.loadState.bind(this))
+									this.saver.handleLoadFile(e, this.loadState.bind(this));
 								}} />
 								</div>
 							</div>
