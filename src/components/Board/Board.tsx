@@ -110,7 +110,7 @@ export default class Board extends React.Component<any, IStateBoard> {
 		this.bot = new Bot(this.referee)
 	}
 
-	reset() {
+	private reset() {
 		if (
 			this.state.against_bot
 			&& this.state.turn === "b"
@@ -150,7 +150,7 @@ export default class Board extends React.Component<any, IStateBoard> {
 		});
 	}
 
-	movePiece(player: "w" | "b", squares: PieceType[], start: number, end: number) {
+	private movePiece(player: "w" | "b", squares: PieceType[], start: number, end: number) {
 		let copy_squares = squares.slice();
 
 		copy_squares = this.highlighter.clearHighlight(copy_squares).slice();
@@ -254,7 +254,7 @@ export default class Board extends React.Component<any, IStateBoard> {
 		});
 	}
 
-	loadState(state: IStateSerialized) {
+	private loadState(state: IStateSerialized) {
 		const deserializedSquares = state.squares.map((classSquare) => {
 			if (classSquare.player) {
 				if (classSquare.name === 'Pawn') return new Pawn(classSquare.player)
@@ -269,7 +269,7 @@ export default class Board extends React.Component<any, IStateBoard> {
 		this.setState({ ...state, squares: deserializedSquares })
 	}
 
-	handlePieceChoose(piece: PanelType) {
+	private handlePieceChoose(piece: PanelType) {
 		if (this.state.selected_piece === piece) {
 			this.setState({
 				selected_piece: null
@@ -281,7 +281,7 @@ export default class Board extends React.Component<any, IStateBoard> {
 		}
 	}
 
-	calcColorTrainingPiece(piece: PanelType) {
+	private calcColorTrainingPiece(piece: PanelType) {
 		if(this.state.selected_piece === piece) {
 			return "selected_white_square "
 		} else {
@@ -290,7 +290,7 @@ export default class Board extends React.Component<any, IStateBoard> {
 		
 	}
 
-	renderPanel(player: "w" | "b") {
+	private renderPanel(player: "w" | "b") {
 		let square_corner;
 		const panel_elements = player === "w" ? this.state.white_panel : this.state.black_panel; 
 		let pieces_array: JSX.Element[] = [];
@@ -319,7 +319,7 @@ export default class Board extends React.Component<any, IStateBoard> {
 		return pieces_array;
 	}
 
-	checkTwoKings() {
+	private checkTwoKings() {
 		const isTwoKings = this.referee.boardHasTwoKings(this.state.squares);
 		if(!isTwoKings) {
 			this.setState({
@@ -336,13 +336,12 @@ export default class Board extends React.Component<any, IStateBoard> {
 	}
 	
 	// обробка натиснення гравця на поле на дошці
-	handleClick(i: number) {
+	private handleClick(i: number) {
 
 		let copy_squares = this.state.squares.slice();
 
 		if(this.state.pieces_selection) {
 			const kingSelected = this.state.selected_piece?.id?.toLowerCase() === "k"
-			const kingClicked = this.state.squares[i]?.id?.toLowerCase() === "k"
 			const checked_squares = this.state.squares.slice();
 
 			if (!this.state.selected_piece) return
