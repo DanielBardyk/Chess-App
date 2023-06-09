@@ -146,19 +146,21 @@ a:active {
   padding: 0px 24px;
 }
 
-.mode_restart {
+.start {
   display: flex;
-  flex-direction: row;
-  justify-content: space-between;
-  width: 220px;
+  justify-content: space-around;
+  width: 50%;
   margin: auto;
-  padding-left: 5px;
+}
+
+.selection_start {
+  width: 100%;
 }
 
 .load_save {
   display: flex;
-  width: 230px;
-  justify-content: space-between;
+  width: 50%;
+  justify-content: space-around;
   margin: auto;
 }
 .load, .save {
@@ -250,9 +252,9 @@ a:active {
   cursor: default;
 }
 
-.bot_running {
+/* .bot_running {
   cursor: progress;
-}
+} */
 
 .label {
   outline: none !important;
@@ -262,6 +264,23 @@ a:active {
   font-size: 120%;
   height: 10vmin;
   width: 10vmin;
+}
+
+.player_selection {
+  display: flex;
+  justify-content: space-around;
+  width: 80%;
+}
+
+.player_button {
+  bottom: 1vmin;
+  width: 10vmin;
+}
+
+.first_player {
+  position: relative;
+  top: 0.8vmin;
+  font-size: 18px;
 }
 
 .label_piece_selection {

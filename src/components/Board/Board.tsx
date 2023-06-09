@@ -18,7 +18,6 @@ export interface IStateBoard {
 	selected_piece: PanelType | null;
 	source: number,
 	turn: "w" | "b",
-	true_turn: "w" | "b",
 	turn_num: number,
 	first_pos: number,
 	second_pos: number,
@@ -31,10 +30,14 @@ export interface IStateBoard {
 	right_white_rook_has_moved: number,
 	passant_pos: number,
 	bot_running: number,
+	error: string | null,
+	first_render: boolean,
 	game_started: boolean,
 	pieces_selection: boolean,
-	mode_choosed: boolean,
+	player_selection: boolean,
+	setting_way_choosed: boolean,
 	against_bot: boolean,
+	bot_first_move: boolean,
 	mated: boolean,
 	move_made: boolean,
 	capture_made: boolean,
@@ -76,7 +79,6 @@ export default class Board extends React.Component<any, IStateBoard> {
 			selected_piece: null,
 			source: -1,
 			turn: "w",
-			true_turn: "w",
 			turn_num: 0,
 			first_pos: 0,
 			second_pos: 0,
@@ -89,10 +91,14 @@ export default class Board extends React.Component<any, IStateBoard> {
 			right_white_rook_has_moved: 0,
 			passant_pos: 65,
 			bot_running: 0,
+			error: null,
+			first_render: true,
 			game_started: false,
 			pieces_selection: false,
-			mode_choosed: false,
+			player_selection: false,
+			setting_way_choosed: false,
 			against_bot: false,
+			bot_first_move: false,
 			mated: false,
 			move_made: false,
 			capture_made: false,
@@ -116,7 +122,6 @@ export default class Board extends React.Component<any, IStateBoard> {
 			squares: this.boardManager.initializeEmptyBoard(),
 			source: -1,
 			turn: "w",
-			true_turn: "w",
 			turn_num: 0,
 			first_pos: 0,
 			second_pos: 0,
@@ -129,9 +134,12 @@ export default class Board extends React.Component<any, IStateBoard> {
 			right_white_rook_has_moved: 0,
 			passant_pos: 65,
 			bot_running: 0,
+			error: null,
+			first_render: true,
 			game_started: false,
 			pieces_selection: false,
-			mode_choosed: false,
+			player_selection: false,
+			setting_way_choosed: false,
 			against_bot: false,
 			mated: false,
 			move_made: false,
@@ -240,7 +248,7 @@ export default class Board extends React.Component<any, IStateBoard> {
 			turn_num: this.state.turn_num + 1,
 			mated: check_mated || stale_mated ? true : false,
 			turn: player === "b" ? "w" : "b",
-			true_turn: player === "b" ? "w" : "b",
+			// true_turn: player === "b" ? "w" : "b",
 			bot_running: (this.state.against_bot && player === "w") ? 1 : 0,
 			move_made: true,
 		});
@@ -310,27 +318,55 @@ export default class Board extends React.Component<any, IStateBoard> {
 		}
 		return pieces_array;
 	}
+
+	checkTwoKings() {
+		const isTwoKings = this.referee.boardHasTwoKings(this.state.squares);
+		if(!isTwoKings) {
+			this.setState({
+				error: "Must be two kings"
+			})
+			setTimeout(() => {
+				this.setState({
+					error: null
+				})
+			}, 2000)
+		}
+
+		return isTwoKings
+	}
 	
 	// обробка натиснення гравця на поле на дошці
 	handleClick(i: number) {
 
 		let copy_squares = this.state.squares.slice();
 
-		console.log(this.state.selected_piece?.id, copy_squares[i].player, this.state.selected_piece?.player)
-
 		if(this.state.pieces_selection) {
+			const kingSelected = this.state.selected_piece?.id?.toLowerCase() === "k"
+			const kingClicked = this.state.squares[i]?.id?.toLowerCase() === "k"
+			const checked_squares = this.state.squares.slice();
+
 			if (!this.state.selected_piece) return
 			else if (this.state.selected_piece.id === "c" && copy_squares[i].player === this.state.selected_piece.player) {
 				copy_squares[i] = new PieceFiller();
 			} 
-			else if (copy_squares.find(p => p.id?.toLowerCase() === "k"
-				&& this.state.selected_piece?.id?.toLowerCase() === "k"
-				&& p.player === this.state.selected_piece.player
-				)) {
-					return
-				}
-				
+			else if (copy_squares.find(p => p.id?.toLowerCase() === "k" && kingSelected
+						&& p.player === this.state.selected_piece?.player)) 
+			{
+				return
+			}
+			else if (kingSelected && !this.referee.kingSettedCorrectly(copy_squares, i))
+			{
+				return
+			}
+			else if ((this.state.turn === this.state.selected_piece.player) && this.state.selected_piece.id !== "c")
+			{
+				checked_squares[i] = this.state.selected_piece as PieceType;
+				const secondPlayer = this.state.turn === "w" ? "b" : "w";
+
+				if (this.referee.inCheck(secondPlayer, checked_squares, this.state)) return
+			}
 			if(this.state.selected_piece.id !== "c") copy_squares[i] = this.state.selected_piece as PieceType;
+
 
 			this.setState({
 				squares: copy_squares,
@@ -402,48 +438,50 @@ export default class Board extends React.Component<any, IStateBoard> {
 				});
 				// рокіровка (або може є ще щось, не знаю)
 			} else {
-				// Якщо не можна зробити рокіровку (або може є ще щось, не знаю) то треба додати підсвітку і змінити певні пропси
-				if (!this.referee.pieceCanMoveThere(this.state.source, i, copy_squares, this.state)) {
-					// не підсвічуати поля, якщо обрано неможливий хід
-					copy_squares[this.state.source].highlight = 0;
-					copy_squares = this.highlighter.clearPossibleMoveHighlight(copy_squares).slice();
-					// якщо користувач під шахом, виділіть короля червоним кольором, якщо користувач намагається зробити хід, який не виведе його з шаху
-					if (
-						// означає, що друге натиснення і король під шахом
-						i !== this.state.source &&
-						this.referee.inCheck(this.state.turn, copy_squares, this.state) === true
-					) {
-						for (let j = 0; j < 64; j++) {
-							if ((this.state.turn === "w" && copy_squares[j].id === "k")
-								|| (this.state.turn === "b" && copy_squares[j].id === "K")) {
-								let king = copy_squares[j] as King;
-								king.inCheck = 1;
-								copy_squares[j] = king;
-								break;
+				if(!this.state.bot_first_move) {
+					// Якщо не можна зробити рокіровку то треба додати підсвітку і змінити певні пропси
+					if (!this.referee.pieceCanMoveThere(this.state.source, i, copy_squares, this.state)) {
+						// не підсвічуати поля, якщо обрано неможливий хід
+						copy_squares[this.state.source].highlight = 0;
+						copy_squares = this.highlighter.clearPossibleMoveHighlight(copy_squares).slice();
+						// якщо користувач під шахом, виділіть короля червоним кольором, якщо користувач намагається зробити хід, який не виведе його з шаху
+						if (
+							// означає, що друге натиснення і король під шахом
+							i !== this.state.source &&
+							this.referee.inCheck(this.state.turn, copy_squares, this.state) === true
+						) {
+							for (let j = 0; j < 64; j++) {
+								if ((this.state.turn === "w" && copy_squares[j].id === "k")
+									|| (this.state.turn === "b" && copy_squares[j].id === "K")) {
+									let king = copy_squares[j] as King;
+									king.inCheck = 1;
+									copy_squares[j] = king;
+									break;
+								}
 							}
+							// індикує що шах підсвічено
+							this.setState({
+								check_flash: true,
+							});
 						}
-						// індикує що шах підсвічено
+						// source: -1 відміняє попередні натискання, через те що рокіровка неможлива. Тепер користувач повинен знову зробити два натискання
 						this.setState({
-							check_flash: true,
+							source: -1,
+							squares: copy_squares,
 						});
+						return "invalid move";
 					}
-					// source: -1 відміняє попередні натискання, через те що рокіровка неможлива. Тепер користувач повинен знову зробити два натискання
-					this.setState({
-						source: -1,
-						squares: copy_squares,
-					});
-					return "invalid move";
-				}
 
-				// функція реалізує переміщення фігури
-				this.movePiece(this.state.turn, copy_squares, this.state.source, i);
+						// функція реалізує переміщення фігури
+						this.movePiece(this.state.turn, copy_squares, this.state.source, i);
 
-				setTimeout(() => {
-					this.setState({
-						move_made: false,
-						capture_made: false,
-					});
-				}, 200);
+						setTimeout(() => {
+							this.setState({
+								move_made: false,
+								capture_made: false,
+							});
+						}, 200);
+					}
 
 				// виклик бота
 				if (this.state.against_bot) {
@@ -458,6 +496,11 @@ export default class Board extends React.Component<any, IStateBoard> {
 							this.state, 
 							this.movePiece.bind(this));
 					}, 700);
+				}
+				if (this.state.bot_first_move) {
+					this.setState({
+						bot_first_move: false
+					})
 				}
 			}
 		}
@@ -564,8 +607,8 @@ export default class Board extends React.Component<any, IStateBoard> {
 					<div className="left_screen bounceInDown">
 						{ this.state.pieces_selection &&
 							<div className="black_panel">{this.renderPanel("b")}</div> }
-						<div className={ row_class }> {row_nums} </div>
-						<div className={ table_class }> {board} </div>
+						<div className={row_class}> {row_nums} </div>
+						<div className={table_class}> {board} </div>
 						<div className={col_class}> {col_nums} </div>
 						{ this.state.pieces_selection &&
 							<div className="white_panel">{this.renderPanel("w")}</div> }
@@ -601,14 +644,17 @@ export default class Board extends React.Component<any, IStateBoard> {
 							</div>
 
 							<div className="button_wrapper">
-								<div className="mode_restart">
-									{!this.state.mode_choosed &&
+								<div className={!this.state.player_selection ? "start" : "start selection_start"}>
+
+									{/* Дошка відкрита перший раз або відбулось очищення дошки */}
+									{this.state.first_render &&
 										<>
 											<button
 											className="button all_pieces"
 											onClick={() => {
 												this.setState({
-													mode_choosed: true,
+													setting_way_choosed: true,
+													first_render: false,
 													squares: this.boardManager.initializeBoard()
 												})
 											}}
@@ -619,10 +665,9 @@ export default class Board extends React.Component<any, IStateBoard> {
 											className="button choose_pieces"
 											onClick={() => {
 												this.setState({
-													pieces_selection: true,
-													mode_choosed: true,
-													black_panel: this.boardManager.createTrainingPiecesArray("b"),
-													white_panel: this.boardManager.createTrainingPiecesArray("w"),
+													setting_way_choosed: true,
+													player_selection: true,
+													first_render: false
 												})
 											}}
 											>
@@ -630,17 +675,29 @@ export default class Board extends React.Component<any, IStateBoard> {
 											</button>
 										</>
 									}
-									{this.state.mode_choosed && !this.state.game_started &&
+
+									{/* Вибір режиму гри, після чого гра починається */}
+									{this.state.setting_way_choosed && !this.state.player_selection && !this.state.game_started &&
 										<>
 											<button
-												className="button against_bot"
+												className="button against_bot"	
 												onClick={() => {
+													this.checkTwoKings() &&
 													this.setState({
 														against_bot: true,
 														pieces_selection: false,
 														selected_piece: null,
-														game_started: true
+														game_started: true,
 													})
+													if(this.state.turn === "b") {
+														this.setState({
+															source: 1,
+															bot_first_move: true
+														})
+														setTimeout(() => {
+															this.handleClick(1);
+														}, 1000)
+													}
 												}}
 											>
 												<p className="button_font">Against Bot</p>
@@ -648,6 +705,7 @@ export default class Board extends React.Component<any, IStateBoard> {
 											<button
 												className="button two_players"
 												onClick={() => {
+													this.checkTwoKings() &&
 													this.setState({
 														against_bot: false,
 														pieces_selection: false,
@@ -660,68 +718,113 @@ export default class Board extends React.Component<any, IStateBoard> {
 											</button>
 										</>
 									}
+
+									{/* Вибір гравця, що ходитиме першим у тренувальному режимі */}
+									{this.state.player_selection && <div className="player_selection">
+										<button
+										className="button player_button"
+										onClick={() => {
+											this.setState({
+												pieces_selection: true,
+												player_selection: false,
+												turn: "w",
+												black_panel: this.boardManager.createTrainingPiecesArray("b"),
+												white_panel: this.boardManager.createTrainingPiecesArray("w"),
+											})
+										}}
+										>
+											<p className="button_font">White</p>
+										</button>
+										<div className="first_player">Moves first</div>
+										<button
+										className="button player_button"
+										onClick={() => {
+											this.setState({
+												pieces_selection: true,
+												player_selection: false,
+												turn: "b",
+												black_panel: this.boardManager.createTrainingPiecesArray("b"),
+												white_panel: this.boardManager.createTrainingPiecesArray("w"),
+											})
+										}}
+										>
+											<p className="button_font">Black</p>
+										</button>
+									</div>}
+
+									{/* Очищення дошки */}
 									{this.state.game_started && <button
 										className="button restart"
 										onClick={() => this.reset()}>
 										<p className="button_font">Restart Game</p>
 									</button>}
-								</div>
-								<div className="load_save">
-								<button
-									className="button save"
-									onClick={() => this.saver.handleSaveFile(this.state)}
-								>
-									<p className="button_font">Save</p>
-								</button>
-								<label htmlFor="file-upload" className="button load">
-									<p className="button_font">Load</p>
-								</label>
-								<input id="file-upload" style={{ display: "none" }} className="button" key={this.state.key} type="file" onChange={(e) => {
-									this.setState((prevState) => ({
-										key: prevState.key + 1,
-									}));
 
-									this.saver.handleLoadFile(e, this.loadState.bind(this));
-								}} />
 								</div>
+									
+								{/* Збереження та відновлення гри */}
+								{ ((this.state.setting_way_choosed && this.state.game_started) || this.state.first_render) && <div className="load_save">
+									{!this.state.first_render && <button
+										className="button save"
+										onClick={() => this.saver.handleSaveFile(this.state)}
+									>
+										<p className="button_font">Save</p>
+									</button>}
+									<label htmlFor="file-upload" className="button load">
+										<p className="button_font">Load</p>
+									</label>
+									<input id="file-upload" style={{ display: "none" }} className="button" key={this.state.key} type="file" onChange={(e) => {
+										this.setState((prevState) => ({
+											key: prevState.key + 1,
+										}));
+
+										this.saver.handleLoadFile(e, this.loadState.bind(this));
+									}} />
+								</div>}
+
 							</div>
 
-							{ this.state.game_started && <div className="mate_wrapper">
-								<p className="small_font">
-									{this.referee.inCheck("w", this.state.squares, this.state) &&
-										!this.referee.checkmate("w", this.state.squares, this.state) === true
-										? "White player is in check!"
-										: ""}
-								</p>
-								<p className="small_font">
-									{this.referee.inCheck("b", this.state.squares, this.state) &&
-										!this.referee.checkmate("b", this.state.squares, this.state) === true
-										? "Black player is in check."
-										: ""}
-								</p>
-								<p className="small_font">
-									{this.referee.checkmate("b", this.state.squares, this.state) === true
-										? "White player won by checkmate!"
-										: ""}
-								</p>
-								<p className="small_font">
-									{this.referee.checkmate("w", this.state.squares, this.state) === true
-										? "Black player won by checkmate."
-										: ""}
-								</p>
-								<p className="small_font">
-									{(this.referee.stalemate("w", this.state.squares, this.state) &&
-										this.state.turn === "w") === true
-										? "White player is in stalemate. Game over."
-										: ""}
-								</p>
-								<p className="small_font">
-									{(this.referee.stalemate("b", this.state.squares, this.state) &&
-										this.state.turn === "b") === true
-										? "Black player is in stalemate. Game over."
-										: ""}
-								</p>
+							{ (this.state.game_started || this.state.error) && <div className="mate_wrapper">
+								{!this.state.error &&
+								<>
+									<p className="small_font">
+										{this.referee.inCheck("w", this.state.squares, this.state) &&
+											!this.referee.checkmate("w", this.state.squares, this.state) === true
+											? "White player is in check!"
+											: ""}
+									</p>
+									<p className="small_font">
+										{this.referee.inCheck("b", this.state.squares, this.state) &&
+											!this.referee.checkmate("b", this.state.squares, this.state) === true
+											? "Black player is in check."
+											: ""}
+									</p>
+									<p className="small_font">
+										{this.referee.checkmate("b", this.state.squares, this.state) === true
+											? "White player won by checkmate!"
+											: ""}
+									</p>
+									<p className="small_font">
+										{this.referee.checkmate("w", this.state.squares, this.state) === true
+											? "Black player won by checkmate."
+											: ""}
+									</p>
+									<p className="small_font">
+										{(this.referee.stalemate("w", this.state.squares, this.state) &&
+											this.state.turn === "w") === true
+											? "White player is in stalemate. Game over."
+											: ""}
+									</p>
+									<p className="small_font">
+										{(this.referee.stalemate("b", this.state.squares, this.state) &&
+											this.state.turn === "b") === true
+											? "Black player is in stalemate. Game over."
+											: ""}
+									</p>
+								</>
+								}
+								<p className="small_font">{this.state.error}</p>
 							</div> }
+
 						</div>
 					</div>
 				</div>
