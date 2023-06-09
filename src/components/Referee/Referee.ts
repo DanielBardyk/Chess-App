@@ -239,4 +239,27 @@ export default class Referee {
 		}
 		return false;
 	}
+
+	public kingSettedCorrectly(squares: PieceType[], index: number) {
+		const numbers: number[] = [1, 7, 8, 9];
+
+		for (let num of numbers) {
+			if (index+num > 64 || index-num < 0) {
+				continue;
+			}
+
+			if(squares[index+num]?.id?.toLowerCase() === "k"
+				|| squares[index-num]?.id?.toLowerCase() === "k")
+			{
+				return false
+			}
+		}
+		return true
+	}
+
+	public boardHasTwoKings(squares: PieceType[]) {
+		const kings = squares.filter(s => s.id?.toLowerCase() === "k");
+		if (kings.length === 2) return true
+		else return false
+	}
 }

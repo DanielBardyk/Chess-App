@@ -146,7 +146,7 @@ a:active {
   padding: 0px 24px;
 }
 
-.mode_restart {
+.start {
   display: flex;
   flex-direction: row;
   justify-content: space-between;
@@ -234,9 +234,9 @@ a:active {
   cursor: default;
 }
 
-.bot_running {
+/* .bot_running {
   cursor: progress;
-}
+} */
 
 .label {
   outline: none !important;
