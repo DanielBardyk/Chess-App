@@ -18,28 +18,26 @@ export interface IStateBoard {
 	selectedPiece: PanelType | null; //
 	source: number, //
 	turn: "w" | "b", //
-	first_pos: number,
-	second_pos: number,
-	repetition: number,
-	white_king_has_moved: number,
-	black_king_has_moved: number,
-	left_black_rook_has_moved: number,
-	right_black_rook_has_moved: number,
-	left_white_rook_has_moved: number,
-	right_white_rook_has_moved: number,
-	passant_pos: number,
-	bot_running: number,
-	error: string | null,
-	first_render: boolean,
-	game_started: boolean,
-	pieces_selection: boolean,
-	player_selection: boolean,
-	setting_way_choosed: boolean,
-	against_bot: boolean,
-	bot_first_move: boolean,
-	mated: boolean,
-	move_made: boolean,
-	capture_made: boolean,
+	first_pos: number, // Bot.ts
+	second_pos: number, // Bot.ts
+	repetition: number, // Bot.ts
+	white_king_has_moved: number, // Referee.ts
+	black_king_has_moved: number, // Referee.ts
+	left_black_rook_has_moved: number, // Referee.ts
+	right_black_rook_has_moved: number, // Referee.ts
+	left_white_rook_has_moved: number, // Referee.ts
+	right_white_rook_has_moved: number, // Referee.ts
+	passantPos: number, //
+	botRunning: number, //
+	error: string | null, //
+	firstRender: boolean, //
+	gameStarted: boolean, //
+	piecesSelection: boolean, //
+	playerSelection: boolean, //
+	settingWayChoosed: boolean, //
+	againstBot: boolean, //
+	botFirstMove: boolean, //
+	mated: boolean, //
 	check_flash: boolean,
 	just_clicked: boolean,
 	key: number
@@ -87,19 +85,17 @@ export default class Board extends React.Component<any, IStateBoard> {
 			right_black_rook_has_moved: 0,
 			left_white_rook_has_moved: 0,
 			right_white_rook_has_moved: 0,
-			passant_pos: 65,
-			bot_running: 0,
+			passantPos: 65,
+			botRunning: 0,
 			error: null,
-			first_render: true,
-			game_started: false,
-			pieces_selection: false,
-			player_selection: false,
-			setting_way_choosed: false,
-			against_bot: false,
-			bot_first_move: false,
+			firstRender: true,
+			gameStarted: false,
+			piecesSelection: false,
+			playerSelection: false,
+			settingWayChoosed: false,
+			againstBot: false,
+			botFirstMove: false,
 			mated: false,
-			move_made: false,
-			capture_made: false,
 			check_flash: false,
 			just_clicked: false,
 			key: 0
@@ -110,7 +106,7 @@ export default class Board extends React.Component<any, IStateBoard> {
 
 	private reset() {
 		if (
-			this.state.against_bot
+			this.state.againstBot
 			&& this.state.turn === "b"
 			&& !this.state.mated
 		)
@@ -129,18 +125,16 @@ export default class Board extends React.Component<any, IStateBoard> {
 			right_black_rook_has_moved: 0,
 			left_white_rook_has_moved: 0,
 			right_white_rook_has_moved: 0,
-			passant_pos: 65,
-			bot_running: 0,
+			passantPos: 65,
+			botRunning: 0,
 			error: null,
-			first_render: true,
-			game_started: false,
-			pieces_selection: false,
-			player_selection: false,
-			setting_way_choosed: false,
-			against_bot: false,
+			firstRender: true,
+			gameStarted: false,
+			piecesSelection: false,
+			playerSelection: false,
+			settingWayChoosed: false,
+			againstBot: false,
 			mated: false,
-			move_made: false,
-			capture_made: false,
 			check_flash: false,
 			just_clicked: false,
 			key: 0
@@ -152,7 +146,7 @@ export default class Board extends React.Component<any, IStateBoard> {
 		let copy_squares = [...squares];
 
 		copy_squares = [...this.highlighter.clearHighlight(copy_squares)];
-		if (!(this.state.against_bot && player === "b")) {
+		if (!(this.state.againstBot && player === "b")) {
 			copy_squares = [...this.highlighter.clearPossibleMoveHighlight(copy_squares)];
 			for (let j = 0; j < 64; j++) {
 				if (copy_squares[start].id === (player === "w" ? "k" : "K")) {
@@ -203,7 +197,7 @@ export default class Board extends React.Component<any, IStateBoard> {
 		}
 
 		const playerComponent = new Player()
-		copy_squares = [...playerComponent.makePossibleMove(copy_squares, start, end, this.state.passant_pos)];
+		copy_squares = [...playerComponent.makePossibleMove(copy_squares, start, end, this.state.passantPos)];
 
 		var passant_true =
 			player === "w"
@@ -240,14 +234,13 @@ export default class Board extends React.Component<any, IStateBoard> {
 			(this.referee.stalemate("b", copy_squares, this.state) && player === "w");
 
 		this.setState({
-			passant_pos: passant,
+			passantPos: passant,
 			squares: copy_squares,
 			source: -1,
 			mated: check_mated || stale_mated ? true : false,
 			turn: player === "b" ? "w" : "b",
 			// true_turn: player === "b" ? "w" : "b",
-			bot_running: (this.state.against_bot && player === "w") ? 1 : 0,
-			move_made: true,
+			botRunning: (this.state.againstBot && player === "w") ? 1 : 0,
 		});
 	}
 
@@ -303,7 +296,7 @@ export default class Board extends React.Component<any, IStateBoard> {
 
 		let copy_squares = [...this.state.squares];
 
-		if(this.state.pieces_selection) {
+		if(this.state.piecesSelection) {
 			const kingSelected = this.state.selectedPiece?.id?.toLowerCase() === "k";
 			const checked_squares = [...this.state.squares];
 
@@ -349,7 +342,6 @@ export default class Board extends React.Component<any, IStateBoard> {
 				copy_squares[i] = this.state.selectedPiece as PieceType;
 			}
 
-
 			this.setState({
 				squares: copy_squares,
 			});
@@ -361,7 +353,7 @@ export default class Board extends React.Component<any, IStateBoard> {
 		if (this.state.mated) return "game-over";
 
 		// Перевірка, чи це перший хід, а не другий. Якщо ніякого поля не обрано або бот не робить хід, то
-		if (this.state.source === -1 && this.state.bot_running === 0) {
+		if (this.state.source === -1 && this.state.botRunning === 0) {
 			// no source has been selected yet
 			// якщо гравець першим натиcканням обрав фігуру опонента, то не перерендерювати нічого, вийти просто
 			if (copy_squares[i].player !== this.state.turn) return -1;
@@ -371,8 +363,6 @@ export default class Board extends React.Component<any, IStateBoard> {
 				this.setState({
 					check_flash: false,
 					just_clicked: false,
-					move_made: false,
-					capture_made: false,
 				});
 
 				// бере фігуру, тому прибираємо підсвітку, що позначає "шах"
@@ -421,7 +411,7 @@ export default class Board extends React.Component<any, IStateBoard> {
 				});
 				// рокіровка (або може є ще щось, не знаю)
 			} else {
-				if(!this.state.bot_first_move) {
+				if(!this.state.botFirstMove) {
 					// Якщо не можна зробити рокіровку то треба додати підсвітку і змінити певні пропси
 					if (!this.referee.pieceCanMoveThere(this.state.source, i, copy_squares, this.state)) {
 						// не підсвічуати поля, якщо обрано неможливий хід
@@ -454,20 +444,12 @@ export default class Board extends React.Component<any, IStateBoard> {
 						});
 						return "invalid move";
 					}
-
 						// функція реалізує переміщення фігури
 						this.movePiece(this.state.turn, copy_squares, this.state.source, i);
-
-						setTimeout(() => {
-							this.setState({
-								move_made: false,
-								capture_made: false,
-							});
-						}, 200);
 					}
 
 				// виклик бота
-				if (this.state.against_bot) {
+				if (this.state.againstBot) {
 					let search_depth = 3;
 					setTimeout(() => {
 						this.bot.execute_bot(
@@ -480,9 +462,9 @@ export default class Board extends React.Component<any, IStateBoard> {
 							this.movePiece.bind(this));
 					}, 700);
 				}
-				if (this.state.bot_first_move) {
+				if (this.state.botFirstMove) {
 					this.setState({
-						bot_first_move: false
+						botFirstMove: false
 					})
 				}
 			}
@@ -524,7 +506,7 @@ export default class Board extends React.Component<any, IStateBoard> {
 				<Label 
 					key={i} 
 					value={8 - i} 
-					size={this.state.pieces_selection ? "label_piece_selection" : "label"} 
+					size={this.state.piecesSelection ? "label_piece_selection" : "label"} 
 				/>
 		));
 
@@ -533,7 +515,7 @@ export default class Board extends React.Component<any, IStateBoard> {
 				<Label
 					key={letter}
 					value={letter}
-					size={this.state.pieces_selection ? "label_piece_selection" : "label"}
+					size={this.state.piecesSelection ? "label_piece_selection" : "label"}
 				/>
 		))
 
@@ -550,11 +532,11 @@ export default class Board extends React.Component<any, IStateBoard> {
 
 				const copy_squares = [...this.state.squares];
 				const square_color = this.boardManager.calcSquareColor(i, j, copy_squares);
-				let square_cursor = (this.state.turn === copy_squares[i * 8 + j].player && !this.state.bot_running) ? "pointer" : "default";
-				if (this.state.bot_running === 1 && !this.state.mated) square_cursor = "bot_running";
+				let square_cursor = (this.state.turn === copy_squares[i * 8 + j].player && !this.state.botRunning) ? "pointer" : "default";
+				if (this.state.botRunning === 1 && !this.state.mated) square_cursor = "bot_running";
 				if (this.state.mated) square_cursor = "default";
-				if(this.state.pieces_selection) square_cursor = "pointer";
-				const square_size = this.state.pieces_selection ? "square_piece_selection " : "square ";
+				if(this.state.piecesSelection) square_cursor = "pointer";
+				const square_size = this.state.piecesSelection ? "square_piece_selection " : "square ";
 
 				squareRows.push(
 					this.squareRenderer.showSquare({
@@ -565,7 +547,7 @@ export default class Board extends React.Component<any, IStateBoard> {
 						corner: square_corner,
 						cursor: square_cursor,
 						onClick: () => {
-							if (this.state.game_started || this.state.pieces_selection) {
+							if (this.state.gameStarted || this.state.piecesSelection) {
 								this.handleClick(i * 8 + j);
 							}
 						}})
@@ -574,20 +556,20 @@ export default class Board extends React.Component<any, IStateBoard> {
 			board.push(<div key={i}>{squareRows}</div>);
 		}
 
-		const table_class = this.state.pieces_selection ? "table_piece_selection" : "table";
-		const col_class = this.state.pieces_selection ? "col_label_piece_selection" : "col_label";
-		const row_class = this.state.pieces_selection ? "row_label_piece_selection" : "row_label";
+		const table_class = this.state.piecesSelection ? "table_piece_selection" : "table";
+		const col_class = this.state.piecesSelection ? "col_label_piece_selection" : "col_label";
+		const row_class = this.state.piecesSelection ? "row_label_piece_selection" : "row_label";
 
 		return (
 			<div>
 				<div className="main_container">
 					<div className="left_screen bounceInDown">
-						{ this.state.pieces_selection &&
+						{ this.state.piecesSelection &&
 							<div className="black_panel">{this.renderPanel("b")}</div> }
 						<div className={row_class}> {row_nums} </div>
 						<div className={table_class}> {board} </div>
 						<div className={col_class}> {col_nums} </div>
-						{ this.state.pieces_selection &&
+						{ this.state.piecesSelection &&
 							<div className="white_panel">{this.renderPanel("w")}</div> }
 					</div>
 
@@ -621,17 +603,17 @@ export default class Board extends React.Component<any, IStateBoard> {
 							</div>
 
 							<div className="button_wrapper">
-								<div className={!this.state.player_selection ? "start" : "start selection_start"}>
+								<div className={!this.state.playerSelection ? "start" : "start selection_start"}>
 
 									{/* Дошка відкрита перший раз або відбулось очищення дошки */}
-									{this.state.first_render &&
+									{this.state.firstRender &&
 										<>
 											<button
 											className="button all_pieces"
 											onClick={() => {
 												this.setState({
-													setting_way_choosed: true,
-													first_render: false,
+													settingWayChoosed: true,
+													firstRender: false,
 													squares: this.boardManager.initializeBoard()
 												})
 											}}
@@ -642,9 +624,9 @@ export default class Board extends React.Component<any, IStateBoard> {
 											className="button choose_pieces"
 											onClick={() => {
 												this.setState({
-													setting_way_choosed: true,
-													player_selection: true,
-													first_render: false
+													settingWayChoosed: true,
+													playerSelection: true,
+													firstRender: false
 												})
 											}}
 											>
@@ -654,22 +636,22 @@ export default class Board extends React.Component<any, IStateBoard> {
 									}
 
 									{/* Вибір режиму гри, після чого гра починається */}
-									{this.state.setting_way_choosed && !this.state.player_selection && !this.state.game_started &&
+									{this.state.settingWayChoosed && !this.state.playerSelection && !this.state.gameStarted &&
 										<>
 											<button
-												className="button against_bot"	
+												className="button againstBot"	
 												onClick={() => {
 													this.checkTwoKings() &&
 													this.setState({
-														against_bot: true,
-														pieces_selection: false,
+														againstBot: true,
+														piecesSelection: false,
 														selectedPiece: null,
-														game_started: true,
+														gameStarted: true,
 													})
 													if(this.state.turn === "b") {
 														this.setState({
 															source: 1,
-															bot_first_move: true
+															botFirstMove: true
 														})
 														setTimeout(() => {
 															this.handleClick(1);
@@ -684,10 +666,10 @@ export default class Board extends React.Component<any, IStateBoard> {
 												onClick={() => {
 													this.checkTwoKings() &&
 													this.setState({
-														against_bot: false,
-														pieces_selection: false,
+														againstBot: false,
+														piecesSelection: false,
 														selectedPiece: null,
-														game_started: true
+														gameStarted: true
 													})
 												}}
 											>
@@ -697,13 +679,13 @@ export default class Board extends React.Component<any, IStateBoard> {
 									}
 
 									{/* Вибір гравця, що ходитиме першим у тренувальному режимі */}
-									{this.state.player_selection && <div className="player_selection">
+									{this.state.playerSelection && <div className="player_selection">
 										<button
 										className="button player_button"
 										onClick={() => {
 											this.setState({
-												pieces_selection: true,
-												player_selection: false,
+												piecesSelection: true,
+												playerSelection: false,
 												turn: "w",
 												blackPanel: this.boardManager.createTrainingPiecesArray("b"),
 												whitePanel: this.boardManager.createTrainingPiecesArray("w"),
@@ -717,8 +699,8 @@ export default class Board extends React.Component<any, IStateBoard> {
 										className="button player_button"
 										onClick={() => {
 											this.setState({
-												pieces_selection: true,
-												player_selection: false,
+												piecesSelection: true,
+												playerSelection: false,
 												turn: "b",
 												blackPanel: this.boardManager.createTrainingPiecesArray("b"),
 												whitePanel: this.boardManager.createTrainingPiecesArray("w"),
@@ -730,7 +712,7 @@ export default class Board extends React.Component<any, IStateBoard> {
 									</div>}
 
 									{/* Очищення дошки */}
-									{this.state.game_started && <button
+									{this.state.gameStarted && <button
 										className="button restart"
 										onClick={() => this.reset()}>
 										<p className="button_font">Restart Game</p>
@@ -739,8 +721,8 @@ export default class Board extends React.Component<any, IStateBoard> {
 								</div>
 									
 								{/* Збереження та відновлення гри */}
-								{ ((this.state.setting_way_choosed && this.state.game_started) || this.state.first_render) && <div className="load_save">
-									{!this.state.first_render && <button
+								{ ((this.state.settingWayChoosed && this.state.gameStarted) || this.state.firstRender) && <div className="load_save">
+									{!this.state.firstRender && <button
 										className="button save"
 										onClick={() => this.saver.handleSaveFile(this.state)}
 									>
@@ -760,7 +742,7 @@ export default class Board extends React.Component<any, IStateBoard> {
 
 							</div>
 
-							{ (this.state.game_started || this.state.error) && <div className="mate_wrapper">
+							{ (this.state.gameStarted || this.state.error) && <div className="mate_wrapper">
 								{!this.state.error &&
 								<>
 									<p className="small_font">

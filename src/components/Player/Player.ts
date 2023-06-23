@@ -3,7 +3,7 @@ import { PieceFiller, Queen } from "../Pieces/Pieces";
 
 export default class Player {
 
-	public makePossibleMove(squares: PieceType[], start: number, end: number, statePassantPos: number, passant_pos: number | null = null) {
+	public makePossibleMove(squares: PieceType[], start: number, end: number, statePassantPos: number, passantPos: number | null = null) {
 		const copy_squares = [...squares];
 		// рокіровка
 		var isKing =
@@ -23,7 +23,7 @@ export default class Player {
 			}
 		}
 
-		var passant = passant_pos === null ? statePassantPos : passant_pos;
+		var passant = passantPos === null ? statePassantPos : passantPos;
 		if (copy_squares[start].id?.toLowerCase() === "p") {
 			if (end - start === -7 || end - start === 9) {
 				if (start + 1 === passant)

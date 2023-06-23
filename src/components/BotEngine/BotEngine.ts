@@ -19,9 +19,9 @@ export default class BotEngine {
 		squares: PieceType[], // приймаємо стан шахової дошки після виконання ходу
 		RA_of_starts: number[],
 		RA_of_ends: number[],
-		passant_pos: number | null,
+		passantPos: number | null,
 		boardState: IStateBoard,
-		makePossibleMove: (squares: PieceType[], start: number, end: number, statePassantPos: number, passant_pos?: number | null) => PieceType[]
+		makePossibleMove: (squares: PieceType[], start: number, end: number, statePassantPos: number, passantPos?: number | null) => PieceType[]
 	) {
 		const copy_squares = [...squares];
 
@@ -44,15 +44,15 @@ export default class BotEngine {
 				for (let j = 0; j < 64; j++) {
 					let end = RA_of_ends[j];
 					if ( // якщо можна зробити хід з поля start на поле end
-						this.referee.pieceCanMoveThere(start, end, copy_squares, boardState, passant_pos) === true
+						this.referee.pieceCanMoveThere(start, end, copy_squares, boardState, passantPos) === true
 					) { // робимо хід. Метод makePossibleMove повертає стан дошки після зробленого ходу
 						const test_squares = [...squares];
 						const test_squares_2 = [...makePossibleMove(
 							test_squares,
 							start,
 							end,
-							boardState.passant_pos,
-							passant_pos
+							boardState.passantPos,
+							passantPos
 						)];
 						// перевіряє, чи зроблений хід є взяттям на проході. Це треба для ф-ії pieceCanMoveThere (без цього вона б оцінювала взяття на прохід як неможливий хід).
 						// якщо це значення не зміниться, то ф-ія pieceCanMoveThere буде знати, що даний рух, який перевіряється, не є взяттям на проході

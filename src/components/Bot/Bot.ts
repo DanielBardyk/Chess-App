@@ -99,16 +99,16 @@ export default class Bot extends Player {
 			} else {
 				const test_squares = [...passed_in_squares];
 				// робимо хід
-				const test_squares_2 = [...this.makePossibleMove(test_squares, start, end, boardState.passant_pos)];
+				const test_squares_2 = [...this.makePossibleMove(test_squares, start, end, boardState.passantPos)];
 				// для взяття на проході
-				var passant_pos = 65;
+				var passantPos = 65;
 				if (
 					test_squares[start].id === "P" &&
 					start >= 8 &&
 					start <= 15 &&
 					end - start === 16
 				)
-					passant_pos = end;
+					passantPos = end;
 				// оцінюємо цей хід. Для цього в мінімаксі оцінюються всі майбутні ходи, і після цього мінімакс повертає оцінку цього ходу.
 				let board_eval = this.botEngine.minimax(
 					depth - 1,
@@ -118,7 +118,7 @@ export default class Bot extends Player {
 					test_squares_2, // передаємо стан шахової дошки після виконання ходу
 					RA_of_starts,
 					RA_of_ends,
-					passant_pos,
+					passantPos,
 					boardState,
 					this.makePossibleMove
 				);

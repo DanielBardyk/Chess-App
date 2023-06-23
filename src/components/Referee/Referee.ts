@@ -3,8 +3,8 @@ import { PieceFiller, Queen } from "../Pieces/Pieces";
 
 export default class Referee {
 
-	private goodPawn(start: number, end: number, squares: PieceType[], boardState: IStateBoard, passant_pos: number | null = null) {
-		var passant = passant_pos === null ? boardState.passant_pos : passant_pos;
+	private goodPawn(start: number, end: number, squares: PieceType[], boardState: IStateBoard, passantPos: number | null = null) {
+		var passant = passantPos === null ? boardState.passantPos : passantPos;
 		var start_row = 8 - Math.floor(start / 8);
 		var start_col = (start % 8) + 1;
 		var end_row = 8 - Math.floor(end / 8);
@@ -48,7 +48,7 @@ export default class Referee {
 		return true;
 	}
 
-	private isMoveInvalid(start: number, end: number, squares: PieceType[], boardState: IStateBoard, passant_pos: number | null = null) {
+	private isMoveInvalid(start: number, end: number, squares: PieceType[], boardState: IStateBoard, passantPos: number | null = null) {
 		const copy_squares: PieceType[] = [...squares];
 		var bqrpk =
 			copy_squares[start].id?.toLowerCase() === "r" ||
@@ -64,7 +64,7 @@ export default class Referee {
 
 		invalid =
 			pawn === true &&
-			this.goodPawn(start, end, copy_squares, boardState, passant_pos) === false;
+			this.goodPawn(start, end, copy_squares, boardState, passantPos) === false;
 		if (invalid) return invalid;
 		var king = copy_squares[start].id?.toLowerCase() === "k";
 		if (king && Math.abs(end - start) === 2)
@@ -146,7 +146,7 @@ export default class Referee {
 		return false;
 	}
 	
-	public pieceCanMoveThere(start: number, end: number, squares: PieceType[], boardState: IStateBoard, passant_pos: number | null = null) {
+	public pieceCanMoveThere(start: number, end: number, squares: PieceType[], boardState: IStateBoard, passantPos: number | null = null) {
 		const copy_squares = [...squares];
 		if (start === end)
 			return false;
@@ -158,7 +158,7 @@ export default class Referee {
 		)
 			return false;
 
-		if (this.isMoveInvalid(start, end, copy_squares, boardState, passant_pos) === true)
+		if (this.isMoveInvalid(start, end, copy_squares, boardState, passantPos) === true)
 			return false;
 
 		var cant_castle =
