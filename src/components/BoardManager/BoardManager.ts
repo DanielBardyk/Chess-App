@@ -1,7 +1,6 @@
-import { PieceType } from "../Board/Board";
+import { IStateBoard, PieceType } from "../Board/Board";
 import { PieceCleaner } from "../PieceCleaner/PieceCleaner";
 import { Pawn, King, Queen, Bishop, Knight, Rook, PieceFiller } from "../Pieces/Pieces"
-import SquareRenderer from "../SquareRenderer/SquareRenderer";
 
 export type PanelType = King | Queen | Bishop | Knight | Rook | PieceCleaner
 
@@ -100,5 +99,13 @@ export default class BoardManager {
 			}
 		}
 		return square_color;
+	}
+
+	public calcColorTrainingPiece(piece: PanelType, boardState: IStateBoard) {
+		if(boardState.selectedPiece === piece) {
+			return "selected_white_square "
+		} else {
+			return "training_piece_square "
+		}
 	}
 }

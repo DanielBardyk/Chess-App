@@ -23,7 +23,7 @@ export default class BotEngine {
 		boardState: IStateBoard,
 		makePossibleMove: (squares: PieceType[], start: number, end: number, statePassantPos: number, passant_pos?: number | null) => PieceType[]
 	) {
-		const copy_squares = squares.slice();
+		const copy_squares = [...squares];
 
 		// коли depth = 0, то ми досягли глибини рекурсії (тобто знайшли усі можливі розвитки партії на 3 ходи вперед). Тепер для них усіх треба зробити оцінку (ця оцінка робиться за к-стю чорних фігур на дошці). Коли depth = 0, ми досягли глибини рекурсії, тепер робимо рекурсивне повернення й кожен раз повертаємо оцінку стану шахового поля для чорного гравця в даному виклику ф-ії. Після повернення цієї функції, ми будемо на рівень вище у дереві (тобто depth = depth + 1). Тому після цього код нижче виконається, в якому знову викличеться minimax, і знову depth = 0. Вже на четвертий раз не викличеться. Тобто викличеться аж коли на три рівні вгорі буде.
 		if (depth === 0) {
@@ -46,14 +46,14 @@ export default class BotEngine {
 					if ( // якщо можна зробити хід з поля start на поле end
 						this.referee.pieceCanMoveThere(start, end, copy_squares, boardState, passant_pos) === true
 					) { // робимо хід. Метод makePossibleMove повертає стан дошки після зробленого ходу
-						const test_squares = squares.slice()
-						const test_squares_2 = makePossibleMove(
+						const test_squares = [...squares];
+						const test_squares_2 = [...makePossibleMove(
 							test_squares,
 							start,
 							end,
 							boardState.passant_pos,
 							passant_pos
-						).slice()
+						)];
 						// перевіряє, чи зроблений хід є взяттям на проході. Це треба для ф-ії pieceCanMoveThere (без цього вона б оцінювала взяття на прохід як неможливий хід).
 						// якщо це значення не зміниться, то ф-ія pieceCanMoveThere буде знати, що даний рух, який перевіряється, не є взяттям на проході
 						var passant = 65;

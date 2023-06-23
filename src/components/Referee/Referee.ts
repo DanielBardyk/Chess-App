@@ -11,7 +11,7 @@ export default class Referee {
 		var end_col = (end % 8) + 1;
 		var row_diff = end_row - start_row;
 		var col_diff = end_col - start_col;
-		const copy_squares = squares.slice();
+		const copy_squares = [...squares];
 
 		if (row_diff === 2 || row_diff === -2) {
 			if (copy_squares[start].player === "w" && (start < 48 || start > 55))
@@ -49,7 +49,7 @@ export default class Referee {
 	}
 
 	private isMoveInvalid(start: number, end: number, squares: PieceType[], boardState: IStateBoard, passant_pos: number | null = null) {
-		const copy_squares: PieceType[] = squares.slice();
+		const copy_squares: PieceType[] = [...squares];
 		var bqrpk =
 			copy_squares[start].id?.toLowerCase() === "r" ||
 			copy_squares[start].id?.toLowerCase() === "q" ||
@@ -74,7 +74,7 @@ export default class Referee {
 	}
 
 	private isCastlingPossible(start: number, end: number, squares: PieceType[], boardState: IStateBoard) {
-		const copy_squares = squares.slice();
+		const copy_squares = [...squares];
 		var player = copy_squares[start].player;
 		var delta_pos = end - start;
 		if (start !== (player === "w" ? 60 : 4)) return false;
@@ -118,7 +118,7 @@ export default class Referee {
 		let col_diff = end_col - start_col;
 		let row_ctr = 0;
 		let col_ctr = 0;
-		const copy_squares = squares.slice();
+		const copy_squares = [...squares];
 
 		while (col_ctr !== col_diff || row_ctr !== row_diff) {
 			let position =
@@ -147,7 +147,7 @@ export default class Referee {
 	}
 	
 	public pieceCanMoveThere(start: number, end: number, squares: PieceType[], boardState: IStateBoard, passant_pos: number | null = null) {
-		const copy_squares = squares.slice();
+		const copy_squares = [...squares];
 		if (start === end)
 			return false;
 
@@ -173,13 +173,13 @@ export default class Referee {
 			Math.abs(end - start) === 2
 		) {
 			var delta_pos = end - start;
-			const test_squares = squares.slice();
+			const test_squares = [...squares];
 			test_squares[start + (delta_pos === 2 ? 1 : -1)] = test_squares[start];
 			test_squares[start] = new PieceFiller();
 			if (this.inCheck(player as "w" | "b", test_squares, boardState)) return false;
 		}
 
-		const check_squares = squares.slice();
+		const check_squares = [...squares];
 		check_squares[end] = check_squares[start];
 		check_squares[start] = new PieceFiller();
 		if (check_squares[end].id === "p" && end >= 0 && end <= 7) {
@@ -219,14 +219,17 @@ export default class Referee {
 
 	public inCheck(player: "w" | "b", squares: PieceType[], boardState: IStateBoard) {
 		let king = player === "w" ? "k" : "K";
-		let position_of_king = 0;
-		const copy_squares = squares.slice();
+		let position_of_king = -1;
+		const copy_squares = [...squares];
 		for (let i = 0; i < 64; i++) {
 			if (copy_squares[i].id === king) {
 					position_of_king = i;
 					break;
 			}
 		}
+
+		if (position_of_king === -1)
+			return false;
 
 		for (let i = 0; i < 64; i++) {
 			if (copy_squares[i].player !== player) {
@@ -261,5 +264,16 @@ export default class Referee {
 		const kings = squares.filter(s => s.id?.toLowerCase() === "k");
 		if (kings.length === 2) return true
 		else return false
+	}
+
+	public pieceCount(id: string, squares: PieceType[], boardState: IStateBoard) {
+		return (
+			squares.filter(
+				(p) => 
+					p.id?.toLowerCase() === id && 
+					p.player === boardState.selectedPiece?.player && 
+					p.id === boardState.selectedPiece.id
+				).length
+		);
 	}
 }

@@ -12,13 +12,12 @@ import Player from "../Player/Player";
 export type PieceType = Pawn | King | Queen | Bishop | Knight | Rook | PieceFiller
 
 export interface IStateBoard {
-	squares: PieceType[],
-	black_panel: PanelType[],
-	white_panel: PanelType[],
-	selected_piece: PanelType | null;
-	source: number,
-	turn: "w" | "b",
-	turn_num: number,
+	squares: PieceType[], //
+	blackPanel: PanelType[], //
+	whitePanel: PanelType[], //
+	selectedPiece: PanelType | null; //
+	source: number, //
+	turn: "w" | "b", //
 	first_pos: number,
 	second_pos: number,
 	repetition: number,
@@ -74,12 +73,11 @@ export default class Board extends React.Component<any, IStateBoard> {
 		this.saver = props.saver;
 		this.state = {
 			squares: this.boardManager.initializeEmptyBoard(),
-			black_panel: [],
-			white_panel: [],
-			selected_piece: null,
+			blackPanel: [],
+			whitePanel: [],
+			selectedPiece: null,
 			source: -1,
 			turn: "w",
-			turn_num: 0,
 			first_pos: 0,
 			second_pos: 0,
 			repetition: 0,
@@ -122,7 +120,6 @@ export default class Board extends React.Component<any, IStateBoard> {
 			squares: this.boardManager.initializeEmptyBoard(),
 			source: -1,
 			turn: "w",
-			turn_num: 0,
 			first_pos: 0,
 			second_pos: 0,
 			repetition: 0,
@@ -150,12 +147,13 @@ export default class Board extends React.Component<any, IStateBoard> {
 		});
 	}
 
+	// переміщення фігури на дошці
 	private movePiece(player: "w" | "b", squares: PieceType[], start: number, end: number) {
-		let copy_squares = squares.slice();
+		let copy_squares = [...squares];
 
-		copy_squares = this.highlighter.clearHighlight(copy_squares).slice();
+		copy_squares = [...this.highlighter.clearHighlight(copy_squares)];
 		if (!(this.state.against_bot && player === "b")) {
-			copy_squares = this.highlighter.clearPossibleMoveHighlight(copy_squares).slice();
+			copy_squares = [...this.highlighter.clearPossibleMoveHighlight(copy_squares)];
 			for (let j = 0; j < 64; j++) {
 				if (copy_squares[start].id === (player === "w" ? "k" : "K")) {
 					let king = copy_squares[j] as King;
@@ -205,7 +203,7 @@ export default class Board extends React.Component<any, IStateBoard> {
 		}
 
 		const playerComponent = new Player()
-		copy_squares = playerComponent.makePossibleMove(copy_squares, start, end, this.state.passant_pos).slice();
+		copy_squares = [...playerComponent.makePossibleMove(copy_squares, start, end, this.state.passant_pos)];
 
 		var passant_true =
 			player === "w"
@@ -220,19 +218,19 @@ export default class Board extends React.Component<any, IStateBoard> {
 		let passant = passant_true ? end : 65;
 
 		if (player === "w") {
-			copy_squares = this.highlighter.highlightMate(
+			copy_squares = [...this.highlighter.highlightMate(
 				"b",
 				copy_squares,
 				this.referee.checkmate("b", copy_squares, this.state),
 				this.referee.stalemate("b", copy_squares, this.state)
-			).slice();
+			)];
 		} else {
-			copy_squares = this.highlighter.highlightMate(
+			copy_squares = [...this.highlighter.highlightMate(
 				"w",
 				copy_squares,
 				this.referee.checkmate("w", copy_squares, this.state),
 				this.referee.stalemate("w", copy_squares, this.state)
-			).slice();
+			)];
 		}
 
 		let check_mated =
@@ -245,7 +243,6 @@ export default class Board extends React.Component<any, IStateBoard> {
 			passant_pos: passant,
 			squares: copy_squares,
 			source: -1,
-			turn_num: this.state.turn_num + 1,
 			mated: check_mated || stale_mated ? true : false,
 			turn: player === "b" ? "w" : "b",
 			// true_turn: player === "b" ? "w" : "b",
@@ -254,6 +251,7 @@ export default class Board extends React.Component<any, IStateBoard> {
 		});
 	}
 
+	// завантаження збереженої гри
 	private loadState(state: IStateSerialized) {
 		const deserializedSquares = state.squares.map((classSquare) => {
 			if (classSquare.player) {
@@ -269,58 +267,10 @@ export default class Board extends React.Component<any, IStateBoard> {
 		this.setState({ ...state, squares: deserializedSquares })
 	}
 
-	private handlePieceChoose(piece: PanelType) {
-		if (this.state.selected_piece === piece) {
-			this.setState({
-				selected_piece: null
-			})
-		} else {
-			this.setState({
-				selected_piece: piece
-			})
-		}
-	}
-
-	private calcColorTrainingPiece(piece: PanelType) {
-		if(this.state.selected_piece === piece) {
-			return "selected_white_square "
-		} else {
-			return "training_piece_square "
-		}
-		
-	}
-
-	private renderPanel(player: "w" | "b") {
-		let square_corner;
-		const panel_elements = player === "w" ? this.state.white_panel : this.state.black_panel; 
-		let pieces_array: JSX.Element[] = [];
-
-		for (let i=0; i < 7; i++) {
-			if (i === 0 && player === "w") square_corner = " bottom_left_square ";
-			else if (i === 6 && player === "w") square_corner = " bottom_right_square ";
-			else if (i === 0 && player === "b") square_corner = " top_left_square ";
-			else if (i === 6 && player === "b") square_corner = " top_right_square ";
-			else square_corner = " "
-
-			pieces_array.push(
-				this.squareRenderer.showSquare({
-					key: i,
-					value: panel_elements[i],
-					size: "square_piece_selection ",
-					color: this.calcColorTrainingPiece(panel_elements[i]),
-					corner: square_corner,
-					cursor: "pointer",
-					onClick: () => {
-						this.handlePieceChoose(panel_elements[i])
-					}
-				})
-			)
-		}
-		return pieces_array;
-	}
-
+	// перевірка двох королей на дошці
 	private checkTwoKings() {
 		const isTwoKings = this.referee.boardHasTwoKings(this.state.squares);
+
 		if(!isTwoKings) {
 			this.setState({
 				error: "Must be two kings"
@@ -334,43 +284,77 @@ export default class Board extends React.Component<any, IStateBoard> {
 
 		return isTwoKings
 	}
+
+	// обробка вибору фігури на панелі
+	private handlePanelPieceChoose(piece: PanelType) {
+		if (this.state.selectedPiece === piece) {
+			this.setState({
+				selectedPiece: null
+			})
+		} else {
+			this.setState({
+				selectedPiece: piece
+			})
+		}
+	}
 	
 	// обробка натиснення гравця на поле на дошці
 	private handleClick(i: number) {
 
-		let copy_squares = this.state.squares.slice();
+		let copy_squares = [...this.state.squares];
 
 		if(this.state.pieces_selection) {
-			const kingSelected = this.state.selected_piece?.id?.toLowerCase() === "k"
-			const checked_squares = this.state.squares.slice();
+			const kingSelected = this.state.selectedPiece?.id?.toLowerCase() === "k";
+			const checked_squares = [...this.state.squares];
 
-			if (!this.state.selected_piece) return
-			else if (this.state.selected_piece.id === "c" && copy_squares[i].player === this.state.selected_piece.player) {
+			if (!this.state.selectedPiece) {
+				return;
+			} else if (
+				this.state.selectedPiece.id === "c" && 
+				copy_squares[i].player === this.state.selectedPiece.player
+				) {
 				copy_squares[i] = new PieceFiller();
-			} 
-			else if (copy_squares.find(p => p.id?.toLowerCase() === "k" && kingSelected
-						&& p.player === this.state.selected_piece?.player)) 
-			{
-				return
+				// не більше одного короля в одного гравця
+			} else if (
+				copy_squares.find(
+					(p) => 
+						p.id?.toLowerCase() === "k" && 
+						kingSelected && 
+						p.player === this.state.selectedPiece?.player
+				)
+			) {
+				return;
+			} else if (
+				this.referee.pieceCount("q", checked_squares, this.state) >= 9 || 
+				this.referee.pieceCount("b", checked_squares, this.state) >= 10 || 
+				this.referee.pieceCount("n", checked_squares, this.state) >= 10 || 
+				this.referee.pieceCount("r", checked_squares, this.state) >= 10 || 
+				this.referee.pieceCount("p", checked_squares, this.state) >= 8
+				) {
+				return;
 			}
-			else if (kingSelected && !this.referee.kingSettedCorrectly(copy_squares, i))
-			{
-				return
+			else if (kingSelected && !this.referee.kingSettedCorrectly(copy_squares, i)) {
+				return;
 			}
-			else if ((this.state.turn === this.state.selected_piece.player) && this.state.selected_piece.id !== "c")
-			{
-				checked_squares[i] = this.state.selected_piece as PieceType;
+			else if (this.state.selectedPiece.id !== "c") {
+				checked_squares[i] = this.state.selectedPiece as PieceType;
 				const secondPlayer = this.state.turn === "w" ? "b" : "w";
-
-				if (this.referee.inCheck(secondPlayer, checked_squares, this.state)) return
+				
+				if (this.referee.inCheck(secondPlayer, checked_squares, this.state)) {
+					return;
+				}
 			}
-			if(this.state.selected_piece.id !== "c") copy_squares[i] = this.state.selected_piece as PieceType;
+			
+			if(this.state.selectedPiece.id !== "c") {
+				copy_squares[i] = this.state.selectedPiece as PieceType;
+			}
 
 
 			this.setState({
 				squares: copy_squares,
 			});
-			return
+
+			return;
 		}
 
 		// кінець гри
@@ -392,7 +376,7 @@ export default class Board extends React.Component<any, IStateBoard> {
 				});
 
 				// бере фігуру, тому прибираємо підсвітку, що позначає "шах"
-				copy_squares = this.highlighter.clearCheckHighlight(copy_squares, this.state.turn).slice();
+				copy_squares = [...this.highlighter.clearCheckHighlight(copy_squares, this.state.turn)];
 				// і підсвічуємо фігуру, що взята
 				copy_squares[i].highlight = 1;
 
@@ -424,7 +408,7 @@ export default class Board extends React.Component<any, IStateBoard> {
 				// прибираємо підсвітку з поля, яке було вибране спочатку
 				copy_squares[this.state.source].highlight = 0;
 				// прибираємо підсвітку для всіх полів, куди можна зробити хід, бо після ходу вони зміняться
-				copy_squares = this.highlighter.clearPossibleMoveHighlight(copy_squares).slice();
+				copy_squares = [...this.highlighter.clearPossibleMoveHighlight(copy_squares)];
 				// підсвічуємо ходи, які тепер можна зробити, після цього ходу
 				for (let j = 0; j < 64; j++) {
 					if (this.referee.pieceCanMoveThere(i, j, copy_squares, this.state))
@@ -442,7 +426,7 @@ export default class Board extends React.Component<any, IStateBoard> {
 					if (!this.referee.pieceCanMoveThere(this.state.source, i, copy_squares, this.state)) {
 						// не підсвічуати поля, якщо обрано неможливий хід
 						copy_squares[this.state.source].highlight = 0;
-						copy_squares = this.highlighter.clearPossibleMoveHighlight(copy_squares).slice();
+						copy_squares = [...this.highlighter.clearPossibleMoveHighlight(copy_squares)];
 						// якщо користувач під шахом, виділіть короля червоним кольором, якщо користувач намагається зробити хід, який не виведе його з шаху
 						if (
 							// означає, що друге натиснення і король під шахом
@@ -505,72 +489,72 @@ export default class Board extends React.Component<any, IStateBoard> {
 		}
 	}
 
+	// рендеринг панелі для вибору фігур у тренувальному режимі
+	private renderPanel(player: "w" | "b") {
+		let square_corner;
+		const panel_elements = player === "w" ? this.state.whitePanel : this.state.blackPanel; 
+		let pieces_array: JSX.Element[] = [];
+
+		for (let i=0; i < 7; i++) {
+			if (i === 0 && player === "w") square_corner = " bottom_left_square ";
+			else if (i === 6 && player === "w") square_corner = " bottom_right_square ";
+			else if (i === 0 && player === "b") square_corner = " top_left_square ";
+			else if (i === 6 && player === "b") square_corner = " top_right_square ";
+			else square_corner = " "
+
+			pieces_array.push(
+				this.squareRenderer.showSquare({
+					key: i,
+					value: panel_elements[i],
+					size: "square_piece_selection ",
+					color: this.boardManager.calcColorTrainingPiece(panel_elements[i], this.state),
+					corner: square_corner,
+					cursor: "pointer",
+					onClick: () => {
+						this.handlePanelPieceChoose(panel_elements[i])
+					}
+				})
+			)
+		}
+		return pieces_array;
+	}
+
 	render() {
-		const row_nums = [];
-		const label_class = this.state.pieces_selection ? "label_piece_selection" : "label";
-		for (let i = 8; i > 0; i--) {
-			row_nums.push(<Label key={i} value={i} size={label_class} />);
-		}
-		const col_nums = [];
-		for (let i = 1; i < 9; i++) {
-			let letter;
-			switch (i) {
-				case 1:
-					letter = "A";
-					break;
-				case 2:
-					letter = "B";
-					break;
-				case 3:
-					letter = "C";
-					break;
-				case 4:
-					letter = "D";
-					break;
-				case 5:
-					letter = "E";
-					break;
-				case 6:
-					letter = "F";
-					break;
-				case 7:
-					letter = "G";
-					break;
-				case 8:
-					letter = "H";
-					break;
-			}
-			col_nums.push(<Label key={letter} value={letter} size={label_class} />);
-		}
+		const row_nums = Array.from({ length: 8 }, (_, i) => (
+				<Label 
+					key={i} 
+					value={8 - i} 
+					size={this.state.pieces_selection ? "label_piece_selection" : "label"} 
+				/>
+		));
+
+		const col_letters = ["A", "B", "C", "D", "E", "F", "G", "H"];
+		const col_nums = col_letters.map((letter) => (
+				<Label
+					key={letter}
+					value={letter}
+					size={this.state.pieces_selection ? "label_piece_selection" : "label"}
+				/>
+		))
 
 		const board = [];
 		for (let i = 0; i < 8; i++) {
 			const squareRows = [];
 			for (let j = 0; j < 8; j++) {
-				let square_corner = null;
-				if (i === 0 && j === 0) {
-					square_corner = " top_left_square ";
-				} else if (i === 0 && j === 7) {
-					square_corner = " top_right_square ";
-				} else if (i === 7 && j === 0) {
-					square_corner = " bottom_left_square ";
-				} else if (i === 7 && j === 7) {
-					square_corner = " bottom_right_square ";
-				} else {
-					square_corner = " ";
-				}
+				const square_corner =
+					(i === 0 && j === 0) ? " top_left_square " :
+					(i === 0 && j === 7) ? " top_right_square " :
+					(i === 7 && j === 0) ? " bottom_left_square " :
+					(i === 7 && j === 7) ? " bottom_right_square " :
+					" ";
 
-				const copy_squares = this.state.squares.slice();
-				let square_color = this.boardManager.calcSquareColor(i, j, copy_squares);
-				let square_cursor = "pointer";
-				if (this.state.turn === copy_squares[i * 8 + j].player && !this.state.bot_running) square_cursor = "pointer"
-				else square_cursor = "default"
-				if (this.state.bot_running === 1 && !this.state.mated)
-					square_cursor = "bot_running";
+				const copy_squares = [...this.state.squares];
+				const square_color = this.boardManager.calcSquareColor(i, j, copy_squares);
+				let square_cursor = (this.state.turn === copy_squares[i * 8 + j].player && !this.state.bot_running) ? "pointer" : "default";
+				if (this.state.bot_running === 1 && !this.state.mated) square_cursor = "bot_running";
 				if (this.state.mated) square_cursor = "default";
-				if(this.state.pieces_selection) square_cursor = "pointer"
-
-				let square_size = this.state.pieces_selection ? "square_piece_selection " : "square ";
+				if(this.state.pieces_selection) square_cursor = "pointer";
+				const square_size = this.state.pieces_selection ? "square_piece_selection " : "square ";
 
 				squareRows.push(
 					this.squareRenderer.showSquare({
@@ -590,15 +574,9 @@ export default class Board extends React.Component<any, IStateBoard> {
 			board.push(<div key={i}>{squareRows}</div>);
 		}
 
-		let table_class = "table";
-		let col_class = "col_label";
-		let row_class = "row_label"
-
-		if (this.state.pieces_selection) {
-			table_class = "table_piece_selection";
-			col_class = "col_label_piece_selection";
-			row_class = "row_label_piece_selection";
-		}
+		const table_class = this.state.pieces_selection ? "table_piece_selection" : "table";
+		const col_class = this.state.pieces_selection ? "col_label_piece_selection" : "col_label";
+		const row_class = this.state.pieces_selection ? "row_label_piece_selection" : "row_label";
 
 		return (
 			<div>
@@ -685,7 +663,7 @@ export default class Board extends React.Component<any, IStateBoard> {
 													this.setState({
 														against_bot: true,
 														pieces_selection: false,
-														selected_piece: null,
+														selectedPiece: null,
 														game_started: true,
 													})
 													if(this.state.turn === "b") {
@@ -708,7 +686,7 @@ export default class Board extends React.Component<any, IStateBoard> {
 													this.setState({
 														against_bot: false,
 														pieces_selection: false,
-														selected_piece: null,
+														selectedPiece: null,
 														game_started: true
 													})
 												}}
@@ -727,8 +705,8 @@ export default class Board extends React.Component<any, IStateBoard> {
 												pieces_selection: true,
 												player_selection: false,
 												turn: "w",
-												black_panel: this.boardManager.createTrainingPiecesArray("b"),
-												white_panel: this.boardManager.createTrainingPiecesArray("w"),
+												blackPanel: this.boardManager.createTrainingPiecesArray("b"),
+												whitePanel: this.boardManager.createTrainingPiecesArray("w"),
 											})
 										}}
 										>
@@ -742,8 +720,8 @@ export default class Board extends React.Component<any, IStateBoard> {
 												pieces_selection: true,
 												player_selection: false,
 												turn: "b",
-												black_panel: this.boardManager.createTrainingPiecesArray("b"),
-												white_panel: this.boardManager.createTrainingPiecesArray("w"),
+												blackPanel: this.boardManager.createTrainingPiecesArray("b"),
+												whitePanel: this.boardManager.createTrainingPiecesArray("w"),
 											})
 										}}
 										>

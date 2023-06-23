@@ -4,7 +4,7 @@ import { PieceFiller, Queen } from "../Pieces/Pieces";
 export default class Player {
 
 	public makePossibleMove(squares: PieceType[], start: number, end: number, statePassantPos: number, passant_pos: number | null = null) {
-		const copy_squares = squares.slice();
+		const copy_squares = [...squares];
 		// рокіровка
 		var isKing =
 			copy_squares[start].id === "k" || copy_squares[start].id === "K";
