@@ -15,7 +15,7 @@ export default class Bot extends Player {
 	}
 
 	private shuffle(passed_in_array: number[]) {
-		const array = passed_in_array.slice();
+		const array = [...passed_in_array];
 		for (let i = array.length - 1; i > 0; i--) {
 			let j = Math.floor(Math.random() * (i + 1));
 			[array[i], array[j]] = [array[j], array[i]];
@@ -34,7 +34,7 @@ export default class Bot extends Player {
 		{
 		// якщо мат, то виходимо
 		if (mated) return "bot cannot run";
-		const copy_squares = passed_in_squares.slice();
+		const copy_squares = [...passed_in_squares];
 
 		let rand_start = 100;
 		let rand_end = 100;
@@ -97,9 +97,9 @@ export default class Bot extends Player {
 				this.repetition = 0
 
 			} else {
-				const test_squares = passed_in_squares.slice();
+				const test_squares = [...passed_in_squares];
 				// робимо хід
-				const test_squares_2 = this.makePossibleMove(test_squares, start, end, boardState.passant_pos).slice();
+				const test_squares_2 = [...this.makePossibleMove(test_squares, start, end, boardState.passant_pos)];
 				// для взяття на проході
 				var passant_pos = 65;
 				if (

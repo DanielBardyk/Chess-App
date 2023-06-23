@@ -2,7 +2,7 @@ import { PieceType } from "../Board/Board";
 
 export default class PieceEvaluator {
 	private reverseForBlack(array: number[][]) {
-		return array.slice().reverse();
+		return [...array].reverse();
 	}
 
 	public getPieceValue(piece: PieceType, position: number) {
