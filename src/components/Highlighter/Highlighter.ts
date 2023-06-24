@@ -4,44 +4,44 @@ import { King } from "../Pieces/Pieces";
 export default class Highlighter {
 
 	public highlightMate(player: "w" | "b", squares: PieceType[], check_mated: boolean, stale_mated: boolean) {
-		const copy_squares = [...squares];
+		const copySquares = [...squares];
 		if (check_mated || stale_mated) {
 			for (let j = 0; j < 64; j++) {
-				if (copy_squares[j].id === (player === "w" ? "k" : "K")) {
-					const king = copy_squares[j] as King;
+				if (copySquares[j].id === (player === "w" ? "k" : "K")) {
+					const king = copySquares[j] as King;
 					king.inCheck = check_mated === true ? 1 : 2;
-					copy_squares[j] = king;
+					copySquares[j] = king;
 					break;
 				}
 			}
 		}
-		return copy_squares;
+		return copySquares;
 	}
 
 	public clearHighlight(squares: PieceType[]) {
-		const copy_squares = [...squares];
+		const copySquares = [...squares];
 		for (let j = 0; j < 64; j++) {
-			if (copy_squares[j].highlight === 1) copy_squares[j].highlight = 0;
+			if (copySquares[j].highlight === 1) copySquares[j].highlight = 0;
 		}
-		return copy_squares;
+		return copySquares;
 	}
 
 	public clearPossibleMoveHighlight(squares: PieceType[]) {
-		const copy_squares = [...squares];
+		const copySquares = [...squares];
 		for (let j = 0; j < 64; j++) {
-			if (copy_squares[j].possible === 1) copy_squares[j].possible = 0;
+			if (copySquares[j].possible === 1) copySquares[j].possible = 0;
 		}
-		return copy_squares;
+		return copySquares;
 	}
 
 	public clearCheckHighlight(squares: PieceType[], player: "w" | "b") {
-    const copy_squares = [...squares];
+    const copySquares = [...squares];
     for (let j = 0; j < 64; j++) {
-        if (copy_squares[j].id === (player === "w" ? "k" : "K")) {
-            (copy_squares[j] as King).inCheck = 0;
+        if (copySquares[j].id === (player === "w" ? "k" : "K")) {
+            (copySquares[j] as King).inCheck = 0;
             break;
         }
     }
-    return copy_squares;
+    return copySquares;
 	}
 }

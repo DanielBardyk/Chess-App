@@ -3,44 +3,44 @@ import { PieceFiller, Queen } from "../Pieces/Pieces";
 
 export default class Referee {
 
-	private goodPawn(start: number, end: number, squares: PieceType[], boardState: IStateBoard, passant_pos: number | null = null) {
-		var passant = passant_pos === null ? boardState.passant_pos : passant_pos;
+	private goodPawn(start: number, end: number, squares: PieceType[], boardState: IStateBoard, passantPos: number | null = null) {
+		var passant = passantPos === null ? boardState.passantPos : passantPos;
 		var start_row = 8 - Math.floor(start / 8);
 		var start_col = (start % 8) + 1;
 		var end_row = 8 - Math.floor(end / 8);
 		var end_col = (end % 8) + 1;
 		var row_diff = end_row - start_row;
 		var col_diff = end_col - start_col;
-		const copy_squares = [...squares];
+		const copySquares = [...squares];
 
 		if (row_diff === 2 || row_diff === -2) {
-			if (copy_squares[start].player === "w" && (start < 48 || start > 55))
+			if (copySquares[start].player === "w" && (start < 48 || start > 55))
 					return false;
-			if (copy_squares[start].player === "b" && (start < 8 || start > 15))
+			if (copySquares[start].player === "b" && (start < 8 || start > 15))
 					return false;
 		}
-		if (copy_squares[end].id !== null) {
+		if (copySquares[end].id !== null) {
 			if (col_diff === 0) return false;
 		}
 
 		if (row_diff === 1 && col_diff === 1) {
-			if (copy_squares[end].id === null) {
-					if (copy_squares[start + 1].id !== "P" || passant !== start + 1)
+			if (copySquares[end].id === null) {
+					if (copySquares[start + 1].id !== "P" || passant !== start + 1)
 						return false;
 			}
 		} else if (row_diff === 1 && col_diff === -1) {
-			if (copy_squares[end].id === null) {
-					if (copy_squares[start - 1].id !== "P" || passant !== start - 1)
+			if (copySquares[end].id === null) {
+					if (copySquares[start - 1].id !== "P" || passant !== start - 1)
 						return false;
 			}
 		} else if (row_diff === -1 && col_diff === 1) {
-			if (copy_squares[end].id === null) {
-					if (copy_squares[start + 1].id !== "p" || passant !== start + 1)
+			if (copySquares[end].id === null) {
+					if (copySquares[start + 1].id !== "p" || passant !== start + 1)
 						return false;
 			}
 		} else if (row_diff === -1 && col_diff === -1) {
-			if (copy_squares[end].id === null) {
-					if (copy_squares[start - 1].id !== "p" || passant !== start - 1)
+			if (copySquares[end].id === null) {
+					if (copySquares[start - 1].id !== "p" || passant !== start - 1)
 						return false;
 			}
 		}
@@ -48,60 +48,60 @@ export default class Referee {
 		return true;
 	}
 
-	private isMoveInvalid(start: number, end: number, squares: PieceType[], boardState: IStateBoard, passant_pos: number | null = null) {
-		const copy_squares: PieceType[] = [...squares];
+	private isMoveInvalid(start: number, end: number, squares: PieceType[], boardState: IStateBoard, passantPos: number | null = null) {
+		const copySquares: PieceType[] = [...squares];
 		var bqrpk =
-			copy_squares[start].id?.toLowerCase() === "r" ||
-			copy_squares[start].id?.toLowerCase() === "q" ||
-			copy_squares[start].id?.toLowerCase() === "b" ||
-			copy_squares[start].id?.toLowerCase() === "p" ||
-			copy_squares[start].id?.toLowerCase() === "k";
+			copySquares[start].id?.toLowerCase() === "r" ||
+			copySquares[start].id?.toLowerCase() === "q" ||
+			copySquares[start].id?.toLowerCase() === "b" ||
+			copySquares[start].id?.toLowerCase() === "p" ||
+			copySquares[start].id?.toLowerCase() === "k";
 		let invalid =
-			bqrpk === true && this.blockersExist(start, end, copy_squares) === true;
+			bqrpk === true && this.blockersExist(start, end, copySquares) === true;
 		if (invalid) return invalid;
 
-		var pawn = copy_squares[start].id?.toLowerCase() === "p";
+		var pawn = copySquares[start].id?.toLowerCase() === "p";
 
 		invalid =
 			pawn === true &&
-			this.goodPawn(start, end, copy_squares, boardState, passant_pos) === false;
+			this.goodPawn(start, end, copySquares, boardState, passantPos) === false;
 		if (invalid) return invalid;
-		var king = copy_squares[start].id?.toLowerCase() === "k";
+		var king = copySquares[start].id?.toLowerCase() === "k";
 		if (king && Math.abs(end - start) === 2)
-			invalid = this.isCastlingPossible(start, end, copy_squares, boardState) === false;
+			invalid = this.isCastlingPossible(start, end, copySquares, boardState) === false;
 
 		return invalid;
 	}
 
 	private isCastlingPossible(start: number, end: number, squares: PieceType[], boardState: IStateBoard) {
-		const copy_squares = [...squares];
-		var player = copy_squares[start].player;
+		const copySquares = [...squares];
+		var player = copySquares[start].player;
 		var delta_pos = end - start;
 		if (start !== (player === "w" ? 60 : 4)) return false;
 		if (
 			(delta_pos === 2
-				? copy_squares[end + 1].id
-				: copy_squares[end - 2].id) !== (player === "w" ? "r" : "R")
+				? copySquares[end + 1].id
+				: copySquares[end - 2].id) !== (player === "w" ? "r" : "R")
 		)
 			return false;
 		if (
 			(player === "w"
-				? boardState.white_king_has_moved
-				: boardState.black_king_has_moved) !== 0
+				? boardState.whiteKingHasMoved
+				: boardState.blackKingHasMoved) !== 0
 		)
 			return false;
 		if (player === "w") {
 			if (
 				(delta_pos === 2
-					? boardState.right_white_rook_has_moved
-					: boardState.left_white_rook_has_moved) !== 0
+					? boardState.rightWhiteRookHasMoved
+					: boardState.leftWhiteRookHasMoved) !== 0
 			)
 				return false;
 		} else if (player === "b") {
 			if (
 				(delta_pos === 2
-					? boardState.right_black_rook_has_moved
-					: boardState.left_black_rook_has_moved) !== 0
+					? boardState.rightBlackRookHasMoved
+					: boardState.leftBlackRookHasMoved) !== 0
 			)
 				return false;
 		}
@@ -118,14 +118,14 @@ export default class Referee {
 		let col_diff = end_col - start_col;
 		let row_ctr = 0;
 		let col_ctr = 0;
-		const copy_squares = [...squares];
+		const copySquares = [...squares];
 
 		while (col_ctr !== col_diff || row_ctr !== row_diff) {
 			let position =
 				64 - start_row * 8 + -8 * row_ctr + (start_col - 1 + col_ctr);
 			if (
-				copy_squares[position].id !== null &&
-				copy_squares[position] !== copy_squares[start]
+				copySquares[position].id !== null &&
+				copySquares[position] !== copySquares[start]
 			)
 				return true;
 			if (col_ctr !== col_diff) {
@@ -146,30 +146,30 @@ export default class Referee {
 		return false;
 	}
 	
-	public pieceCanMoveThere(start: number, end: number, squares: PieceType[], boardState: IStateBoard, passant_pos: number | null = null) {
-		const copy_squares = [...squares];
+	public pieceCanMoveThere(start: number, end: number, squares: PieceType[], boardState: IStateBoard, passantPos: number | null = null) {
+		const copySquares = [...squares];
 		if (start === end)
 			return false;
 
-		var player = copy_squares[start].player;
+		var player = copySquares[start].player;
 		if (
-			player === copy_squares[end].player ||
-			copy_squares[start].pieceCanMove(start, end) === false
+			player === copySquares[end].player ||
+			copySquares[start].pieceCanMove(start, end) === false
 		)
 			return false;
 
-		if (this.isMoveInvalid(start, end, copy_squares, boardState, passant_pos) === true)
+		if (this.isMoveInvalid(start, end, copySquares, boardState, passantPos) === true)
 			return false;
 
 		var cant_castle =
-			copy_squares[start].id === (player === "w" ? "k" : "K") &&
+			copySquares[start].id === (player === "w" ? "k" : "K") &&
 			Math.abs(end - start) === 2 &&
-			this.inCheck(player as "w" | "b", copy_squares, boardState);
+			this.inCheck(player as "w" | "b", copySquares, boardState);
 		if (cant_castle) return false;
 
 
 		if (
-			copy_squares[start].id === (player === "w" ? "k" : "K") &&
+			copySquares[start].id === (player === "w" ? "k" : "K") &&
 			Math.abs(end - start) === 2
 		) {
 			var delta_pos = end - start;
@@ -220,9 +220,9 @@ export default class Referee {
 	public inCheck(player: "w" | "b", squares: PieceType[], boardState: IStateBoard) {
 		let king = player === "w" ? "k" : "K";
 		let position_of_king = -1;
-		const copy_squares = [...squares];
+		const copySquares = [...squares];
 		for (let i = 0; i < 64; i++) {
-			if (copy_squares[i].id === king) {
+			if (copySquares[i].id === king) {
 					position_of_king = i;
 					break;
 			}
@@ -232,10 +232,10 @@ export default class Referee {
 			return false;
 
 		for (let i = 0; i < 64; i++) {
-			if (copy_squares[i].player !== player) {
+			if (copySquares[i].player !== player) {
 					if (
-						copy_squares[i].pieceCanMove(i, position_of_king) === true &&
-						this.isMoveInvalid(i, position_of_king, copy_squares, boardState) === false
+						copySquares[i].pieceCanMove(i, position_of_king) === true &&
+						this.isMoveInvalid(i, position_of_king, copySquares, boardState) === false
 					)
 						return true;
 			}
