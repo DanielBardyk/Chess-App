@@ -1,5 +1,4 @@
 import RedCross from "../../assets/images/piece_cleaner.png"
-import { PieceType } from "../Board/Board";
 
 export class PieceCleaner {
 	private _icon: React.ReactElement = <img alt='' src = {RedCross} className = "piece" />;

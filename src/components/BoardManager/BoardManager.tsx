@@ -87,10 +87,10 @@ export default class BoardManager {
 	}
 
 	public createTrainingPiecesArray(player: "w" | "b") {
-		const panel_elements: PanelType[] = [new King(player), new Queen(player), new Rook(player), new Bishop(player), 
+		const panelElements: PanelType[] = [new King(player), new Queen(player), new Rook(player), new Bishop(player), 
 			new Knight(player), new Pawn(player), new PieceCleaner(player)];
 			
-		return panel_elements;
+		return panelElements;
 	}
 
 	private isEven(value: number) {

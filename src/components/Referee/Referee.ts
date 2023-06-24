@@ -5,40 +5,40 @@ export default class Referee {
 
 	private goodPawn(start: number, end: number, squares: PieceType[], boardState: IStateBoard, passantPos: number | null = null) {
 		var passant = passantPos === null ? boardState.passantPos : passantPos;
-		var start_row = 8 - Math.floor(start / 8);
-		var start_col = (start % 8) + 1;
-		var end_row = 8 - Math.floor(end / 8);
-		var end_col = (end % 8) + 1;
-		var row_diff = end_row - start_row;
-		var col_diff = end_col - start_col;
+		var startRow = 8 - Math.floor(start / 8);
+		var startCol = (start % 8) + 1;
+		var endRow = 8 - Math.floor(end / 8);
+		var endCol = (end % 8) + 1;
+		var rowDiff = endRow - startRow;
+		var colDiff = endCol - startCol;
 		const copySquares = [...squares];
 
-		if (row_diff === 2 || row_diff === -2) {
+		if (rowDiff === 2 || rowDiff === -2) {
 			if (copySquares[start].player === "w" && (start < 48 || start > 55))
 					return false;
 			if (copySquares[start].player === "b" && (start < 8 || start > 15))
 					return false;
 		}
 		if (copySquares[end].id !== null) {
-			if (col_diff === 0) return false;
+			if (colDiff === 0) return false;
 		}
 
-		if (row_diff === 1 && col_diff === 1) {
+		if (rowDiff === 1 && colDiff === 1) {
 			if (copySquares[end].id === null) {
 					if (copySquares[start + 1].id !== "P" || passant !== start + 1)
 						return false;
 			}
-		} else if (row_diff === 1 && col_diff === -1) {
+		} else if (rowDiff === 1 && colDiff === -1) {
 			if (copySquares[end].id === null) {
 					if (copySquares[start - 1].id !== "P" || passant !== start - 1)
 						return false;
 			}
-		} else if (row_diff === -1 && col_diff === 1) {
+		} else if (rowDiff === -1 && colDiff === 1) {
 			if (copySquares[end].id === null) {
 					if (copySquares[start + 1].id !== "p" || passant !== start + 1)
 						return false;
 			}
-		} else if (row_diff === -1 && col_diff === -1) {
+		} else if (rowDiff === -1 && colDiff === -1) {
 			if (copySquares[end].id === null) {
 					if (copySquares[start - 1].id !== "p" || passant !== start - 1)
 						return false;
@@ -76,10 +76,10 @@ export default class Referee {
 	private isCastlingPossible(start: number, end: number, squares: PieceType[], boardState: IStateBoard) {
 		const copySquares = [...squares];
 		var player = copySquares[start].player;
-		var delta_pos = end - start;
+		var deltaPos = end - start;
 		if (start !== (player === "w" ? 60 : 4)) return false;
 		if (
-			(delta_pos === 2
+			(deltaPos === 2
 				? copySquares[end + 1].id
 				: copySquares[end - 2].id) !== (player === "w" ? "r" : "R")
 		)
@@ -92,14 +92,14 @@ export default class Referee {
 			return false;
 		if (player === "w") {
 			if (
-				(delta_pos === 2
+				(deltaPos === 2
 					? boardState.rightWhiteRookHasMoved
 					: boardState.leftWhiteRookHasMoved) !== 0
 			)
 				return false;
 		} else if (player === "b") {
 			if (
-				(delta_pos === 2
+				(deltaPos === 2
 					? boardState.rightBlackRookHasMoved
 					: boardState.leftBlackRookHasMoved) !== 0
 			)
@@ -110,36 +110,36 @@ export default class Referee {
 	}
 
 	private blockersExist(start: number, end: number, squares: PieceType[]) {
-		var start_row = 8 - Math.floor(start / 8);
-		var start_col = (start % 8) + 1;
-		var end_row = 8 - Math.floor(end / 8);
-		var end_col = (end % 8) + 1;
-		let row_diff = end_row - start_row;
-		let col_diff = end_col - start_col;
-		let row_ctr = 0;
-		let col_ctr = 0;
+		var startRow = 8 - Math.floor(start / 8);
+		var startCol = (start % 8) + 1;
+		var endRow = 8 - Math.floor(end / 8);
+		var endCol = (end % 8) + 1;
+		let rowDiff = endRow - startRow;
+		let colDiff = endCol - startCol;
+		let rowCtr = 0;
+		let colCtr = 0;
 		const copySquares = [...squares];
 
-		while (col_ctr !== col_diff || row_ctr !== row_diff) {
+		while (colCtr !== colDiff || rowCtr !== rowDiff) {
 			let position =
-				64 - start_row * 8 + -8 * row_ctr + (start_col - 1 + col_ctr);
+				64 - startRow * 8 + -8 * rowCtr + (startCol - 1 + colCtr);
 			if (
 				copySquares[position].id !== null &&
 				copySquares[position] !== copySquares[start]
 			)
 				return true;
-			if (col_ctr !== col_diff) {
-				if (col_diff > 0) {
-					++col_ctr;
+			if (colCtr !== colDiff) {
+				if (colDiff > 0) {
+					++colCtr;
 				} else {
-					--col_ctr;
+					--colCtr;
 				}
 			}
-			if (row_ctr !== row_diff) {
-				if (row_diff > 0) {
-					++row_ctr;
+			if (rowCtr !== rowDiff) {
+				if (rowDiff > 0) {
+					++rowCtr;
 				} else {
-					--row_ctr;
+					--rowCtr;
 				}
 			}
 		}
@@ -161,33 +161,33 @@ export default class Referee {
 		if (this.isMoveInvalid(start, end, copySquares, boardState, passantPos) === true)
 			return false;
 
-		var cant_castle =
+		var cantCastle =
 			copySquares[start].id === (player === "w" ? "k" : "K") &&
 			Math.abs(end - start) === 2 &&
 			this.inCheck(player as "w" | "b", copySquares, boardState);
-		if (cant_castle) return false;
+		if (cantCastle) return false;
 
 
 		if (
 			copySquares[start].id === (player === "w" ? "k" : "K") &&
 			Math.abs(end - start) === 2
 		) {
-			var delta_pos = end - start;
-			const test_squares = [...squares];
-			test_squares[start + (delta_pos === 2 ? 1 : -1)] = test_squares[start];
-			test_squares[start] = new PieceFiller();
-			if (this.inCheck(player as "w" | "b", test_squares, boardState)) return false;
+			var deltaPos = end - start;
+			const testSquares = [...squares];
+			testSquares[start + (deltaPos === 2 ? 1 : -1)] = testSquares[start];
+			testSquares[start] = new PieceFiller();
+			if (this.inCheck(player as "w" | "b", testSquares, boardState)) return false;
 		}
 
-		const check_squares = [...squares];
-		check_squares[end] = check_squares[start];
-		check_squares[start] = new PieceFiller();
-		if (check_squares[end].id === "p" && end >= 0 && end <= 7) {
-			check_squares[end] = new Queen("w");
-		} else if (check_squares[end].id === "P" && end >= 56 && end <= 63) {
-			check_squares[end] = new Queen("b");
+		const checkSquares = [...squares];
+		checkSquares[end] = checkSquares[start];
+		checkSquares[start] = new PieceFiller();
+		if (checkSquares[end].id === "p" && end >= 0 && end <= 7) {
+			checkSquares[end] = new Queen("w");
+		} else if (checkSquares[end].id === "P" && end >= 56 && end <= 63) {
+			checkSquares[end] = new Queen("b");
 		}
-		if (this.inCheck(player as "w" | "b", check_squares, boardState) === true) return false;
+		if (this.inCheck(player as "w" | "b", checkSquares, boardState) === true) return false;
 
 		return true;
 	}
@@ -197,9 +197,9 @@ export default class Referee {
 
 		for (let i = 0; i < 64; i++) {
 			if (squares[i].player === player) {
-					for (let j = 0; j < 64; j++) {
-						if (this.pieceCanMoveThere(i, j, squares, boardState)) return false;
-					}
+				for (let j = 0; j < 64; j++) {
+					if (this.pieceCanMoveThere(i, j, squares, boardState)) return false;
+				}
 			}
 		}
 		return true;
@@ -209,9 +209,9 @@ export default class Referee {
 		if (!this.inCheck(player, squares, boardState)) return false;
 		for (let i = 0; i < 64; i++) {
 			if (squares[i].player === player) {
-					for (let j = 0; j < 64; j++) {
-						if (this.pieceCanMoveThere(i, j, squares, boardState)) return false;
-					}
+				for (let j = 0; j < 64; j++) {
+					if (this.pieceCanMoveThere(i, j, squares, boardState)) return false;
+				}
 			}
 		}
 		return true;
@@ -219,23 +219,23 @@ export default class Referee {
 
 	public inCheck(player: "w" | "b", squares: PieceType[], boardState: IStateBoard) {
 		let king = player === "w" ? "k" : "K";
-		let position_of_king = -1;
+		let positionOfKing = -1;
 		const copySquares = [...squares];
 		for (let i = 0; i < 64; i++) {
 			if (copySquares[i].id === king) {
-					position_of_king = i;
+					positionOfKing = i;
 					break;
 			}
 		}
 
-		if (position_of_king === -1)
+		if (positionOfKing === -1)
 			return false;
 
 		for (let i = 0; i < 64; i++) {
 			if (copySquares[i].player !== player) {
 					if (
-						copySquares[i].pieceCanMove(i, position_of_king) === true &&
-						this.isMoveInvalid(i, position_of_king, copySquares, boardState) === false
+						copySquares[i].pieceCanMove(i, positionOfKing) === true &&
+						this.isMoveInvalid(i, positionOfKing, copySquares, boardState) === false
 					)
 						return true;
 			}

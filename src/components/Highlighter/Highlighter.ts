@@ -3,13 +3,13 @@ import { King } from "../Pieces/Pieces";
 
 export default class Highlighter {
 
-	public highlightMate(player: "w" | "b", squares: PieceType[], check_mated: boolean, stale_mated: boolean) {
+	public highlightMate(player: "w" | "b", squares: PieceType[], checkMated: boolean, staleMated: boolean) {
 		const copySquares = [...squares];
-		if (check_mated || stale_mated) {
+		if (checkMated || staleMated) {
 			for (let j = 0; j < 64; j++) {
 				if (copySquares[j].id === (player === "w" ? "k" : "K")) {
 					const king = copySquares[j] as King;
-					king.inCheck = check_mated === true ? 1 : 2;
+					king.inCheck = checkMated === true ? 1 : 2;
 					copySquares[j] = king;
 					break;
 				}
@@ -47,13 +47,13 @@ export default class Highlighter {
 	}
 
 	public clearCheckHighlight(squares: PieceType[], player: "w" | "b") {
-    const copySquares = [...squares];
-    for (let j = 0; j < 64; j++) {
-        if (copySquares[j].id === (player === "w" ? "k" : "K")) {
-            (copySquares[j] as King).inCheck = 0;
-            break;
-        }
-    }
-    return copySquares;
+		const copySquares = [...squares];
+		for (let j = 0; j < 64; j++) {
+			if (copySquares[j].id === (player === "w" ? "k" : "K")) {
+				(copySquares[j] as King).inCheck = 0;
+				break;
+			}
+		}
+		return copySquares;
 	}
 }

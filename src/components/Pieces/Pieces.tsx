@@ -77,23 +77,23 @@ export class Pawn extends Piece {
 	}
 
 	public pieceCanMove(start: number, end: number): boolean {
-		const start_row = 8 - Math.floor(start / 8);
-		const start_col = (start % 8) + 1;
-		const end_row = 8 - Math.floor(end / 8);
-		const end_col = (end % 8) + 1;
+		const startRow = 8 - Math.floor(start / 8);
+		const startCol = (start % 8) + 1;
+		const endRow = 8 - Math.floor(end / 8);
+		const endCol = (end % 8) + 1;
 
-		const row_diff = end_row - start_row;
-		const col_diff = end_col - start_col;
+		const rowDiff = endRow - startRow;
+		const colDiff = endCol - startCol;
 
 		if (this._player === "w") {
 			return (
-				col_diff === 0 && (row_diff === 1 || row_diff === 2) ||
-				(col_diff === -1 || col_diff === 1) && row_diff === 1
+				(colDiff === 0 && (rowDiff === 1 || rowDiff === 2)) ||
+				((colDiff === -1 || colDiff === 1) && rowDiff === 1)
 			);
 		} else {
 			return (
-				col_diff === 0 && (row_diff === -2 || row_diff === -1) ||
-				(col_diff === -1 || col_diff === 1) && row_diff === -1
+				(colDiff === 0 && (rowDiff === -2 || rowDiff === -1)) ||
+				((colDiff === -1 || colDiff === 1) && rowDiff === -1)
 			);
 		}
 	}
@@ -110,25 +110,25 @@ export class King extends Piece {
 	}
 
 	public pieceCanMove(start: number, end: number): boolean {
-		const start_row = 8 - Math.floor(start / 8);
-		const start_col = (start % 8) + 1;
-		const end_row = 8 - Math.floor(end / 8);
-		const end_col = (end % 8) + 1;
+		const startRow = 8 - Math.floor(start / 8);
+		const startCol = (start % 8) + 1;
+		const endRow = 8 - Math.floor(end / 8);
+		const endCol = (end % 8) + 1;
 
-		const row_diff = end_row - start_row;
-		const col_diff = end_col - start_col;
+		const rowDiff = endRow - startRow;
+		const colDiff = endCol - startCol;
 
 		return (
-			(row_diff === 1 && col_diff === -1) ||
-			(row_diff === 1 && col_diff === 0) ||
-			(row_diff === 1 && col_diff === 1) ||
-			(row_diff === 0 && col_diff === 1) ||
-			(row_diff === -1 && col_diff === 1) ||
-			(row_diff === -1 && col_diff === 0) ||
-			(row_diff === -1 && col_diff === -1) ||
-			(row_diff === 0 && col_diff === -1) ||
-			(row_diff === 0 && col_diff === 2) ||
-			(row_diff === 0 && col_diff === -2)
+			(rowDiff === 1 && colDiff === -1) ||
+			(rowDiff === 1 && colDiff === 0) ||
+			(rowDiff === 1 && colDiff === 1) ||
+			(rowDiff === 0 && colDiff === 1) ||
+			(rowDiff === -1 && colDiff === 1) ||
+			(rowDiff === -1 && colDiff === 0) ||
+			(rowDiff === -1 && colDiff === -1) ||
+			(rowDiff === 0 && colDiff === -1) ||
+			(rowDiff === 0 && colDiff === 2) ||
+			(rowDiff === 0 && colDiff === -2)
 		);
 	}
 
@@ -156,21 +156,21 @@ export class Queen extends Piece {
 	}
 
 	public pieceCanMove(start: number, end: number): boolean {
-		const start_row = 8 - Math.floor(start / 8);
-		const start_col = (start % 8) + 1;
-		const end_row = 8 - Math.floor(end / 8);
-		const end_col = (end % 8) + 1;
+		const startRow = 8 - Math.floor(start / 8);
+		const startCol = (start % 8) + 1;
+		const endRow = 8 - Math.floor(end / 8);
+		const endCol = (end % 8) + 1;
 
-		const row_diff = end_row - start_row;
-		const col_diff = end_col - start_col;
+		const rowDiff = endRow - startRow;
+		const colDiff = endCol - startCol;
 
 		return (
-			(row_diff > 0 && col_diff === 0) ||
-			(row_diff === 0 && col_diff > 0) ||
-			(row_diff < 0 && col_diff === 0) ||
-			(row_diff === 0 && col_diff < 0) ||
-			row_diff === col_diff ||
-			row_diff === -col_diff
+			(rowDiff > 0 && colDiff === 0) ||
+			(rowDiff === 0 && colDiff > 0) ||
+			(rowDiff < 0 && colDiff === 0) ||
+			(rowDiff === 0 && colDiff < 0) ||
+			rowDiff === colDiff ||
+			rowDiff === -colDiff
 		);
 	}
 }
@@ -182,15 +182,15 @@ export class Bishop extends Piece {
 	}
 
 	public pieceCanMove(start: number, end: number): boolean {
-		const start_row = 8 - Math.floor(start / 8);
-		const start_col = (start % 8) + 1;
-		const end_row = 8 - Math.floor(end / 8);
-		const end_col = (end % 8) + 1;
+		const startRow = 8 - Math.floor(start / 8);
+		const startCol = (start % 8) + 1;
+		const endRow = 8 - Math.floor(end / 8);
+		const endCol = (end % 8) + 1;
 
-		const row_diff = end_row - start_row;
-		const col_diff = end_col - start_col;
+		const rowDiff = endRow - startRow;
+		const colDiff = endCol - startCol;
 
-		return row_diff === col_diff || row_diff === -col_diff;
+		return rowDiff === colDiff || rowDiff === -colDiff;
 	}
 }
 
@@ -201,23 +201,23 @@ export class Knight extends Piece {
 	}
 
 	public pieceCanMove(start: number, end: number): boolean {
-		const start_row = 8 - Math.floor(start / 8);
-		const start_col = (start % 8) + 1;
-		const end_row = 8 - Math.floor(end / 8);
-		const end_col = (end % 8) + 1;
+		const startRow = 8 - Math.floor(start / 8);
+		const startCol = (start % 8) + 1;
+		const endRow = 8 - Math.floor(end / 8);
+		const endCol = (end % 8) + 1;
 
-		const row_diff = end_row - start_row;
-		const col_diff = end_col - start_col;
+		const rowDiff = endRow - startRow;
+		const colDiff = endCol - startCol;
 
 		return (
-			(row_diff === 1 && col_diff === -2) ||
-			(row_diff === 2 && col_diff === -1) ||
-			(row_diff === 2 && col_diff === 1) ||
-			(row_diff === 1 && col_diff === 2) ||
-			(row_diff === -1 && col_diff === 2) ||
-			(row_diff === -2 && col_diff === 1) ||
-			(row_diff === -2 && col_diff === -1) ||
-			(row_diff === -1 && col_diff === -2)
+			(rowDiff === 1 && colDiff === -2) ||
+			(rowDiff === 2 && colDiff === -1) ||
+			(rowDiff === 2 && colDiff === 1) ||
+			(rowDiff === 1 && colDiff === 2) ||
+			(rowDiff === -1 && colDiff === 2) ||
+			(rowDiff === -2 && colDiff === 1) ||
+			(rowDiff === -2 && colDiff === -1) ||
+			(rowDiff === -1 && colDiff === -2)
 		);
 	}
 }
@@ -229,19 +229,19 @@ export class Rook extends Piece {
 	}
 
 	public pieceCanMove(start: number, end: number): boolean {
-		const start_row = 8 - Math.floor(start / 8);
-		const start_col = (start % 8) + 1;
-		const end_row = 8 - Math.floor(end / 8);
-		const end_col = (end % 8) + 1;
+		const startRow = 8 - Math.floor(start / 8);
+		const startCol = (start % 8) + 1;
+		const endRow = 8 - Math.floor(end / 8);
+		const endCol = (end % 8) + 1;
 
-		const row_diff = end_row - start_row;
-		const col_diff = end_col - start_col;
+		const rowDiff = endRow - startRow;
+		const colDiff = endCol - startCol;
 
 		return (
-			(row_diff > 0 && col_diff === 0) ||
-			(row_diff === 0 && col_diff > 0) ||
-			(row_diff < 0 && col_diff === 0) ||
-			(row_diff === 0 && col_diff < 0)
+			(rowDiff > 0 && colDiff === 0) ||
+			(rowDiff === 0 && colDiff > 0) ||
+			(rowDiff < 0 && colDiff === 0) ||
+			(rowDiff === 0 && colDiff < 0)
 		);
 	}
 }
