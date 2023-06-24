@@ -138,4 +138,29 @@ export default class BoardManager {
 			return "training_piece_square "
 		}
 	}
+
+	public calcSquareCorner(i: number, j: number) {
+		if (i === 0 && j === 0) return " top_left_square ";
+		if (i === 0 && j === 7) return " top_right_square ";
+		if (i === 7 && j === 0) return " bottom_left_square ";
+		if (i === 7 && j === 7) return " bottom_right_square ";
+		return " ";
+	}
+
+	public calcSquareCursor(i: number, j: number, copySquares: PieceType[], boardState: IStateBoard) {
+		let squareCursor = (boardState.turn === copySquares[i * 8 + j].player && !boardState.botRunning) ? "pointer" : "default";
+		if (boardState.botRunning === 1 && !boardState.mated) squareCursor = "bot_running";
+		if (boardState.mated) squareCursor = "default";
+		if(boardState.piecesSelection) squareCursor = "pointer";
+
+		return squareCursor;
+	}
+
+	public calcPanelSquareCorner(i: number, player: "w" | "b") {
+		if (i === 0 && player === "w") return " bottom_left_square ";
+			else if (i === 6 && player === "w") return " bottom_right_square ";
+			else if (i === 0 && player === "b") return " top_left_square ";
+			else if (i === 6 && player === "b") return " top_right_square ";
+			else return " "
+	}
 }

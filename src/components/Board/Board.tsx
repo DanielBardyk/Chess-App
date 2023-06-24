@@ -355,7 +355,7 @@ export default class Board extends React.Component<any, IStateBoard> {
 					this.state.secondPos,
 					this.state, 
 					this.movePiece.bind(this));
-			}, 1000);
+			}, 1200);
 		}
 	}
 
@@ -412,7 +412,6 @@ export default class Board extends React.Component<any, IStateBoard> {
 		return;
 	}
 	
-	// обробка натиснення гравця на поле на дошці
 	private handleClick(i: number) {
 
 		let copySquares = [...this.state.squares];
@@ -428,41 +427,16 @@ export default class Board extends React.Component<any, IStateBoard> {
 		}
 	}
 
-	private calcSquareCorner(i: number, j: number) {
-		if (i === 0 && j === 0) return " top_left_square ";
-		if (i === 0 && j === 7) return " top_right_square ";
-		if (i === 7 && j === 0) return " bottom_left_square ";
-		if (i === 7 && j === 7) return " bottom_right_square ";
-		return " ";
-	}
-
-	private calcSquareCursor(i: number, j: number, copySquares: PieceType[]) {
-		let squareCursor = (this.state.turn === copySquares[i * 8 + j].player && !this.state.botRunning) ? "pointer" : "default";
-		if (this.state.botRunning === 1 && !this.state.mated) squareCursor = "bot_running";
-		if (this.state.mated) squareCursor = "default";
-		if(this.state.piecesSelection) squareCursor = "pointer";
-
-		return squareCursor;
-	}
-
-	private getPanelSquareCorner(i: number, player: "w" | "b") {
-		if (i === 0 && player === "w") return " bottom_left_square ";
-			else if (i === 6 && player === "w") return " bottom_right_square ";
-			else if (i === 0 && player === "b") return " top_left_square ";
-			else if (i === 6 && player === "b") return " top_right_square ";
-			else return " "
-	}
-
 	private createCurrentBoard() {
 		const board = [];
 		for (let i = 0; i < 8; i++) {
 			const squareRows = [];
 			for (let j = 0; j < 8; j++) {
 
-				const squareCorner = this.calcSquareCorner(i, j);
+				const squareCorner = this.boardManager.calcSquareCorner(i, j);
 				const copySquares = [...this.state.squares];
 				const squareColor = this.boardManager.calcSquareColor(i, j, copySquares);
-				const squareCursor = this.calcSquareCursor(i, j, copySquares);
+				const squareCursor = this.boardManager.calcSquareCursor(i, j, copySquares, this.state);
 				const squareSize = this.state.piecesSelection ? "square_piece_selection " : "square ";
 
 				squareRows.push(
@@ -492,7 +466,7 @@ export default class Board extends React.Component<any, IStateBoard> {
 		let piecesArray: JSX.Element[] = [];
 
 		for (let i=0; i < 7; i++) {
-			const squareCorner = this.getPanelSquareCorner(i, player);
+			const squareCorner = this.boardManager.calcPanelSquareCorner(i, player);
 
 			piecesArray.push(
 				this.squareRenderer.showSquare({
