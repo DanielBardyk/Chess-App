@@ -23,7 +23,7 @@ export default class Bot extends Player {
 		return array;
 	}
 
-	public execute_bot(depth: number,
+	public executeBot(depth: number,
 		passed_in_squares: PieceType[],
 		mated: boolean,
 		firstPos: number,

@@ -18,6 +18,18 @@ export default class Highlighter {
 		return copySquares;
 	}
 
+	public highlightCheck(squares: PieceType[], turn: "w" | "b") {
+		for (let j = 0; j < 64; j++) {
+			if ((turn === "w" && squares[j].id === "k")
+				|| (turn === "b" && squares[j].id === "K")) {
+				let king = squares[j] as King;
+				king.inCheck = 1;
+				squares[j] = king;
+				break;
+			}
+		}
+	}
+
 	public clearHighlight(squares: PieceType[]) {
 		const copySquares = [...squares];
 		for (let j = 0; j < 64; j++) {

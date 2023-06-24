@@ -35,7 +35,6 @@ export interface IStateBoard {
 	playerSelection: boolean,
 	settingWayChoosed: boolean,
 	againstBot: boolean,
-	botFirstMove: boolean,
 	mated: boolean,
 	checkHighlighted: boolean,
 	just_clicked: boolean,
@@ -93,7 +92,6 @@ export default class Board extends React.Component<any, IStateBoard> {
 			playerSelection: false,
 			settingWayChoosed: false,
 			againstBot: false,
-			botFirstMove: false,
 			mated: false,
 			checkHighlighted: false,
 			just_clicked: false,
@@ -314,18 +312,6 @@ export default class Board extends React.Component<any, IStateBoard> {
 		}
 	}
 
-	private highlightCheck(squares: PieceType[]) {
-		for (let j = 0; j < 64; j++) {
-			if ((this.state.turn === "w" && squares[j].id === "k")
-				|| (this.state.turn === "b" && squares[j].id === "K")) {
-				let king = squares[j] as King;
-				king.inCheck = 1;
-				squares[j] = king;
-				break;
-			}
-		}
-	}
-
 	private handleSamePieceTwice(i: number, squares: PieceType[]) {
 		squares[i].highlight = 1;
 		squares[this.state.source].highlight = 0;
@@ -342,6 +328,25 @@ export default class Board extends React.Component<any, IStateBoard> {
 		});
 	}
 
+	private handleInvalidMove(i: number, squares: PieceType[]) {
+		squares[this.state.source].highlight = 0;
+		squares = [...this.highlighter.clearPossibleMoveHighlight(squares)];
+
+		// якщо хід не виводить із шаху підсвічуємо
+		if (i !== this.state.source && this.referee.inCheck(this.state.turn, squares, this.state)) {
+			this.highlighter.highlightCheck(squares, this.state.turn);
+			this.setState({
+				checkHighlighted: true,
+			});
+		}
+
+		this.setState({
+			source: -1,
+			squares: squares,
+		});
+		return "invalid move";
+	}
+
 	private handleSecondClick(i: number, squares: PieceType[]) {
 		// ця змінна true, якщо гравець на другому натисканні вибрав його фігуру
 		const isPlayerPiece = squares[i].player === this.state.turn;
@@ -349,103 +354,85 @@ export default class Board extends React.Component<any, IStateBoard> {
 		// this.state.source !== i перевіряє чи не натиснув гравець на його ж фігуру ще раз (інакше рокіровка, або може є ще щось, не знаю)
 		if (isPlayerPiece === true && this.state.source !== i) {
 			this.handleSamePieceTwice(i, squares);
-		} else { // рокіровка
-			if(!this.state.botFirstMove) {
-				// Якщо хід зробити неможливо то треба змінити підсвітку
-				if (!this.referee.pieceCanMoveThere(this.state.source, i, squares, this.state)) {
-					squares[this.state.source].highlight = 0;
-					squares = [...this.highlighter.clearPossibleMoveHighlight(squares)];
-					// якщо хід не виводить із шаху підсвічуємо
-					if (i !== this.state.source && this.referee.inCheck(this.state.turn, squares, this.state)) {
-						this.highlightCheck(squares);
-						this.setState({
-							checkHighlighted: true,
-						});
-					}
-					// source: -1 відміняє попередні натискання, через те що рокіровка неможлива. Тепер користувач повинен знову зробити два натискання
-					this.setState({
-						source: -1,
-						squares: squares,
-					});
-					return "invalid move";
-				}
-
+		}
+		else {
+			if (!this.referee.pieceCanMoveThere(this.state.source, i, squares, this.state)) {
+				this.handleInvalidMove(i, squares);
+			}
+			else {
 				this.movePiece(this.state.turn, squares, this.state.source, i);
+				this.runBot();
 			}
+		}
+	}
 
-			if (this.state.againstBot) {
-				let search_depth = 3;
-				setTimeout(() => {
-					this.bot.execute_bot(
-						search_depth, 
-						this.state.squares, 
-						this.state.mated,
-						this.state.firstPos,
-						this.state.secondPos,
-						this.state, 
-						this.movePiece.bind(this));
-				}, 700);
-			}
-			
-			if (this.state.botFirstMove) {
-				this.setState({
-					botFirstMove: false
-				})
-			}
+	private runBot() {
+		if (this.state.againstBot) {
+			let search_depth = 3;
+			setTimeout(() => {
+				this.bot.executeBot(
+					search_depth, 
+					this.state.squares, 
+					this.state.mated,
+					this.state.firstPos,
+					this.state.secondPos,
+					this.state, 
+					this.movePiece.bind(this));
+			}, 1000);
 		}
 	}
 
 	private handlePieceSelection(i: number, squares: PieceType[]) {
 		const kingSelected = this.state.selectedPiece?.id?.toLowerCase() === "k";
-			const checked_squares = [...this.state.squares];
+		const checked_squares = [...this.state.squares];
 
-			if (!this.state.selectedPiece) {
-				return;
-			} else if (
-				this.state.selectedPiece.id === "c" && 
-				squares[i].player === this.state.selectedPiece.player
-				) {
-					squares[i] = new PieceFiller();
-				// не більше одного короля в одного гравця
-			} else if (
-				squares.find(
-					(p) => 
-						p.id?.toLowerCase() === "k" && 
-						kingSelected && 
-						p.player === this.state.selectedPiece?.player
-				)
-			) {
-				return;
-			} else if (
-				this.referee.pieceCount("q", checked_squares, this.state) >= 9 || 
-				this.referee.pieceCount("b", checked_squares, this.state) >= 10 || 
-				this.referee.pieceCount("n", checked_squares, this.state) >= 10 || 
-				this.referee.pieceCount("r", checked_squares, this.state) >= 10 || 
-				this.referee.pieceCount("p", checked_squares, this.state) >= 8
-				) {
-				return;
-			}
-			else if (kingSelected && !this.referee.kingSettedCorrectly(squares, i)) {
-				return;
-			}
-			else if (this.state.selectedPiece.id !== "c") {
-				checked_squares[i] = this.state.selectedPiece as PieceType;
-				const secondPlayer = this.state.turn === "w" ? "b" : "w";
-				
-				if (this.referee.inCheck(secondPlayer, checked_squares, this.state)) {
-					return;
-				}
-			}
-			
-			if(this.state.selectedPiece.id !== "c") {
-				squares[i] = this.state.selectedPiece as PieceType;
-			}
-
-			this.setState({
-				squares: squares,
-			});
-
+		if (!this.state.selectedPiece) {
 			return;
+		} else if (
+			this.state.selectedPiece.id === "c" && 
+			squares[i].player === this.state.selectedPiece.player
+			) {
+				squares[i] = new PieceFiller();
+			// не більше одного короля в одного гравця
+		} else if (
+			squares.find(
+				(p) => 
+					p.id?.toLowerCase() === "k" && 
+					kingSelected && 
+					p.player === this.state.selectedPiece?.player
+			)
+		) {
+			return;
+		} else if (
+			this.referee.pieceCount("q", checked_squares, this.state) >= 9 || 
+			this.referee.pieceCount("b", checked_squares, this.state) >= 10 || 
+			this.referee.pieceCount("n", checked_squares, this.state) >= 10 || 
+			this.referee.pieceCount("r", checked_squares, this.state) >= 10 || 
+			this.referee.pieceCount("p", checked_squares, this.state) >= 8
+			) {
+			return;
+		}
+		else if (kingSelected && !this.referee.kingSettedCorrectly(squares, i)) {
+			return;
+		}
+		else if (this.state.selectedPiece.id !== "c") {
+			checked_squares[i] = this.state.selectedPiece as PieceType;
+			const secondPlayer = this.state.turn === "w" ? "b" : "w";
+			
+			if (this.referee.inCheck(secondPlayer, checked_squares, this.state)) {
+				return;
+			}
+		}
+		
+		if(this.state.selectedPiece.id !== "c") {
+			squares[i] = this.state.selectedPiece as PieceType;
+		}
+
+		this.setState({
+			squares: squares,
+		});
+
+		return;
 	}
 	
 	// обробка натиснення гравця на поле на дошці
@@ -464,7 +451,7 @@ export default class Board extends React.Component<any, IStateBoard> {
 		}
 	}
 
-	private getSquareCorner(i: number, j: number) {
+	private calcSquareCorner(i: number, j: number) {
 		if (i === 0 && j === 0) return " top_left_square ";
 		if (i === 0 && j === 7) return " top_right_square ";
 		if (i === 7 && j === 0) return " bottom_left_square ";
@@ -472,7 +459,7 @@ export default class Board extends React.Component<any, IStateBoard> {
 		return " ";
 	}
 
-	private getSquareCursor(i: number, j: number, copySquares: PieceType[]) {
+	private calcSquareCursor(i: number, j: number, copySquares: PieceType[]) {
 		let squareCursor = (this.state.turn === copySquares[i * 8 + j].player && !this.state.botRunning) ? "pointer" : "default";
 		if (this.state.botRunning === 1 && !this.state.mated) squareCursor = "bot_running";
 		if (this.state.mated) squareCursor = "default";
@@ -495,10 +482,10 @@ export default class Board extends React.Component<any, IStateBoard> {
 			const squareRows = [];
 			for (let j = 0; j < 8; j++) {
 
-				const squareCorner = this.getSquareCorner(i, j);
+				const squareCorner = this.calcSquareCorner(i, j);
 				const copySquares = [...this.state.squares];
 				const squareColor = this.boardManager.calcSquareColor(i, j, copySquares);
-				const squareCursor = this.getSquareCursor(i, j, copySquares);
+				const squareCursor = this.calcSquareCursor(i, j, copySquares);
 				const squareSize = this.state.piecesSelection ? "square_piece_selection " : "square ";
 
 				squareRows.push(
@@ -648,10 +635,9 @@ export default class Board extends React.Component<any, IStateBoard> {
 													if(this.state.turn === "b") {
 														this.setState({
 															source: 1,
-															botFirstMove: true
 														})
 														setTimeout(() => {
-															this.handleClick(1);
+															this.runBot();
 														}, 1000)
 													}
 												}}
