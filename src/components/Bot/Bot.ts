@@ -34,7 +34,7 @@ export default class Bot extends Player {
 		{
 		// якщо мат, то виходимо
 		if (mated) return "bot cannot run";
-		const copy_squares = [...passed_in_squares];
+		const copySquares = [...passed_in_squares];
 
 		let rand_start = 100;
 		let rand_end = 100;
@@ -58,7 +58,7 @@ export default class Bot extends Player {
 			let start = RA_of_starts[i];
 			// ця зміння true, якщо на цьому полі стоїть фігура бота, інакше false
 			let isBlackPiece =
-				copy_squares[start].id !== null && copy_squares[start].player === "b";
+				copySquares[start].id !== null && copySquares[start].player === "b";
 			// якщо фігура бота, то
 			if (isBlackPiece) {
 				// для кожного кінцевого поля (поля "B")
@@ -66,7 +66,7 @@ export default class Bot extends Player {
 					// беремо кінцеве поле (квадрат)
 					let end = RA_of_ends[j];
 					// перевіряємо чи можна походити з поля "A" на поле "B"
-					if (this.referee.pieceCanMoveThere(start, end, copy_squares, boardState) === true) {
+					if (this.referee.pieceCanMoveThere(start, end, copySquares, boardState) === true) {
 						// якщо можна, додаємо поля "A" та "B"
 						moves.push(start);
 						moves.push(end);
@@ -146,7 +146,7 @@ export default class Bot extends Player {
 				this.repetition = 0
 			}
 
-			movePiece("b", copy_squares, rand_start, rand_end);
+			movePiece("b", copySquares, rand_start, rand_end);
 		}
 	}
 

@@ -23,11 +23,11 @@ export default class BotEngine {
 		boardState: IStateBoard,
 		makePossibleMove: (squares: PieceType[], start: number, end: number, statePassantPos: number, passantPos?: number | null) => PieceType[]
 	) {
-		const copy_squares = [...squares];
+		const copySquares = [...squares];
 
 		// коли depth = 0, то ми досягли глибини рекурсії (тобто знайшли усі можливі розвитки партії на 3 ходи вперед). Тепер для них усіх треба зробити оцінку (ця оцінка робиться за к-стю чорних фігур на дошці). Коли depth = 0, ми досягли глибини рекурсії, тепер робимо рекурсивне повернення й кожен раз повертаємо оцінку стану шахового поля для чорного гравця в даному виклику ф-ії. Після повернення цієї функції, ми будемо на рівень вище у дереві (тобто depth = depth + 1). Тому після цього код нижче виконається, в якому знову викличеться minimax, і знову depth = 0. Вже на четвертий раз не викличеться. Тобто викличеться аж коли на три рівні вгорі буде.
 		if (depth === 0) {
-			return this.evaluate_black(copy_squares);
+			return this.evaluate_black(copySquares);
 		}
 
 		let best_value = is_black_player ? -9999 : 9999;
@@ -36,7 +36,7 @@ export default class BotEngine {
 			let start = RA_of_starts[i];
 			// перевірка, чи є на полі фігура
 			let isPlayerPiece =
-				copy_squares[start].id !== null && copy_squares[start].player === (is_black_player ? "b" : "w");
+				copySquares[start].id !== null && copySquares[start].player === (is_black_player ? "b" : "w");
 
 			// якщо поле не пусте, то
 			if (isPlayerPiece) {
@@ -44,7 +44,7 @@ export default class BotEngine {
 				for (let j = 0; j < 64; j++) {
 					let end = RA_of_ends[j];
 					if ( // якщо можна зробити хід з поля start на поле end
-						this.referee.pieceCanMoveThere(start, end, copy_squares, boardState, passantPos) === true
+						this.referee.pieceCanMoveThere(start, end, copySquares, boardState, passantPos) === true
 					) { // робимо хід. Метод makePossibleMove повертає стан дошки після зробленого ходу
 						const test_squares = [...squares];
 						const test_squares_2 = [...makePossibleMove(

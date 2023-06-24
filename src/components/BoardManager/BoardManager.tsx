@@ -1,6 +1,7 @@
 import { IStateBoard, PieceType } from "../Board/Board";
 import { PieceCleaner } from "../PieceCleaner/PieceCleaner";
 import { Pawn, King, Queen, Bishop, Knight, Rook, PieceFiller } from "../Pieces/Pieces"
+import Label from "../Label/Label";
 
 export type PanelType = King | Queen | Bishop | Knight | Rook | PieceCleaner
 
@@ -56,6 +57,35 @@ export default class BoardManager {
 		return squares;
 	}
 
+	public generateLabels(boardState: IStateBoard) {
+		const rowNums = Array.from({ length: 8 }, (_, i) => {
+		  const value = 8 - i;
+		  return (
+			 <Label
+				key={i} 
+				value={value} 
+				size={boardState.piecesSelection ? "label_piece_selection" : "label"} 
+			 />
+		  );
+		});
+	 
+		const colLetters = Array.from({ length: 8 }, (_, i) => {
+		  const letter = String.fromCharCode(65 + i);
+		  return (
+			 <Label
+				key={letter}
+				value={letter}
+				size={boardState.piecesSelection ? "label_piece_selection" : "label"}
+			 />
+		  );
+		});
+	 
+		return {
+			rowNums,
+			colLetters
+		};
+	}
+
 	public createTrainingPiecesArray(player: "w" | "b") {
 		const panel_elements: PanelType[] = [new King(player), new Queen(player), new Rook(player), new Bishop(player), 
 			new Knight(player), new Pawn(player), new PieceCleaner(player)];
@@ -68,18 +98,18 @@ export default class BoardManager {
 	}
 
 	public calcSquareColor(i: number, j: number, squares: PieceType[]) {
-		let square_color =
+		let squareColor =
 			(this.isEven(i) && this.isEven(j)) || (!this.isEven(i) && !this.isEven(j))
 			? "white_square"
 			: "black_square";
 		if (squares[i * 8 + j].highlight === 1) {
-			square_color =
+			squareColor =
 			(this.isEven(i) && this.isEven(j)) || (!this.isEven(i) && !this.isEven(j))
 				? "selected_white_square"
 				: "selected_black_square";
 		}
 		if (squares[i * 8 + j].possible === 1) {
-			square_color =
+			squareColor =
 			(this.isEven(i) && this.isEven(j)) || (!this.isEven(i) && !this.isEven(j))
 				? "highlighted_white_square"
 				: "highlighted_black_square";
@@ -89,16 +119,16 @@ export default class BoardManager {
 			(squares[i * 8 + j].id as string).toLowerCase() === "k"
 		) {
 			if ((squares[i * 8 + j] as King).inCheck === 1) {
-			square_color =
+			squareColor =
 				(this.isEven(i) && this.isEven(j)) || (!this.isEven(i) && !this.isEven(j))
 					? "in_check_square_white"
 					: "in_check_square_black";
 			}
 			if ((squares[i * 8 + j] as King).checked >= 1) {
-				square_color = (squares[i * 8 + j] as King).checked === 1 ? "checked_square" : "stale_square";
+				squareColor = (squares[i * 8 + j] as King).checked === 1 ? "checked_square" : "stale_square";
 			}
 		}
-		return square_color;
+		return squareColor;
 	}
 
 	public calcColorTrainingPiece(piece: PanelType, boardState: IStateBoard) {
