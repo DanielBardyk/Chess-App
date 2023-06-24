@@ -12,32 +12,32 @@ import Player from "../Player/Player";
 export type PieceType = Pawn | King | Queen | Bishop | Knight | Rook | PieceFiller
 
 export interface IStateBoard {
-	squares: PieceType[], //
-	blackPanel: PanelType[], //
-	whitePanel: PanelType[], //
-	selectedPiece: PanelType | null; //
-	source: number, //
-	turn: "w" | "b", //
-	first_pos: number, // Bot.ts
-	second_pos: number, // Bot.ts
-	repetition: number, // Bot.ts
-	white_king_has_moved: number, // Referee.ts
-	black_king_has_moved: number, // Referee.ts
-	left_black_rook_has_moved: number, // Referee.ts
-	right_black_rook_has_moved: number, // Referee.ts
-	left_white_rook_has_moved: number, // Referee.ts
-	right_white_rook_has_moved: number, // Referee.ts
-	passantPos: number, //
-	botRunning: number, //
-	error: string | null, //
-	firstRender: boolean, //
-	gameStarted: boolean, //
-	piecesSelection: boolean, //
-	playerSelection: boolean, //
-	settingWayChoosed: boolean, //
-	againstBot: boolean, //
-	botFirstMove: boolean, //
-	mated: boolean, //
+	squares: PieceType[],
+	blackPanel: PanelType[],
+	whitePanel: PanelType[],
+	selectedPiece: PanelType | null;
+	source: number,
+	turn: "w" | "b",
+	firstPos: number, // Bot
+	secondPos: number, // Bot
+	repetition: number, // Bot
+	whiteKingHasMoved: number, // Referee
+	blackKingHasMoved: number, // Referee
+	leftBlackRookHasMoved: number, // Referee
+	rightBlackRookHasMoved: number, // Referee
+	leftWhiteRookHasMoved: number, // Referee
+	rightWhiteRookHasMoved: number, // Referee
+	passantPos: number,
+	botRunning: number,
+	error: string | null,
+	firstRender: boolean,
+	gameStarted: boolean,
+	piecesSelection: boolean,
+	playerSelection: boolean,
+	settingWayChoosed: boolean,
+	againstBot: boolean,
+	botFirstMove: boolean,
+	mated: boolean,
 	check_flash: boolean,
 	just_clicked: boolean,
 	key: number
@@ -76,15 +76,15 @@ export default class Board extends React.Component<any, IStateBoard> {
 			selectedPiece: null,
 			source: -1,
 			turn: "w",
-			first_pos: 0,
-			second_pos: 0,
+			firstPos: 0,
+			secondPos: 0,
 			repetition: 0,
-			white_king_has_moved: 0,
-			black_king_has_moved: 0,
-			left_black_rook_has_moved: 0,
-			right_black_rook_has_moved: 0,
-			left_white_rook_has_moved: 0,
-			right_white_rook_has_moved: 0,
+			whiteKingHasMoved: 0,
+			blackKingHasMoved: 0,
+			leftBlackRookHasMoved: 0,
+			rightBlackRookHasMoved: 0,
+			leftWhiteRookHasMoved: 0,
+			rightWhiteRookHasMoved: 0,
 			passantPos: 65,
 			botRunning: 0,
 			error: null,
@@ -116,15 +116,15 @@ export default class Board extends React.Component<any, IStateBoard> {
 			squares: this.boardManager.initializeEmptyBoard(),
 			source: -1,
 			turn: "w",
-			first_pos: 0,
-			second_pos: 0,
+			firstPos: 0,
+			secondPos: 0,
 			repetition: 0,
-			white_king_has_moved: 0,
-			black_king_has_moved: 0,
-			left_black_rook_has_moved: 0,
-			right_black_rook_has_moved: 0,
-			left_white_rook_has_moved: 0,
-			right_white_rook_has_moved: 0,
+			whiteKingHasMoved: 0,
+			blackKingHasMoved: 0,
+			leftBlackRookHasMoved: 0,
+			rightBlackRookHasMoved: 0,
+			leftWhiteRookHasMoved: 0,
+			rightWhiteRookHasMoved: 0,
 			passantPos: 65,
 			botRunning: 0,
 			error: null,
@@ -161,11 +161,11 @@ export default class Board extends React.Component<any, IStateBoard> {
 		if (copy_squares[start].id === (player === "w" ? "k" : "K")) {
 			if (player === "w") {
 				this.setState({
-					white_king_has_moved: 1,
+					whiteKingHasMoved: 1,
 				});
 			} else {
 				this.setState({
-					black_king_has_moved: 1,
+					blackKingHasMoved: 1,
 				});
 			}
 		}
@@ -175,22 +175,22 @@ export default class Board extends React.Component<any, IStateBoard> {
 			if (start === (player === "w" ? 56 : 0)) {
 				if (player === "w") {
 					this.setState({
-						left_white_rook_has_moved: 1,
+						leftWhiteRookHasMoved: 1,
 					});
 				} else {
 					this.setState({
-						left_black_rook_has_moved: 1,
+						leftBlackRookHasMoved: 1,
 					});
 				}
 				// якщо походила права тура, то змінюємо пропс, який буде вказувати, що рокіровку через королівський фланг більше зробити не можна
 			} else if (start === (player === "w" ? 63 : 7)) {
 				if (player === "w") {
 					this.setState({
-						right_white_rook_has_moved: 1,
+						rightWhiteRookHasMoved: 1,
 					});
 				} else {
 					this.setState({
-						right_black_rook_has_moved: 1,
+						rightBlackRookHasMoved: 1,
 					});
 				}
 			}
@@ -456,8 +456,8 @@ export default class Board extends React.Component<any, IStateBoard> {
 							search_depth, 
 							this.state.squares, 
 							this.state.mated,
-							this.state.first_pos,
-							this.state.second_pos,
+							this.state.firstPos,
+							this.state.secondPos,
 							this.state, 
 							this.movePiece.bind(this));
 					}, 700);

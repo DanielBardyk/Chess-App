@@ -86,22 +86,22 @@ export default class Referee {
 			return false;
 		if (
 			(player === "w"
-				? boardState.white_king_has_moved
-				: boardState.black_king_has_moved) !== 0
+				? boardState.whiteKingHasMoved
+				: boardState.blackKingHasMoved) !== 0
 		)
 			return false;
 		if (player === "w") {
 			if (
 				(delta_pos === 2
-					? boardState.right_white_rook_has_moved
-					: boardState.left_white_rook_has_moved) !== 0
+					? boardState.rightWhiteRookHasMoved
+					: boardState.leftWhiteRookHasMoved) !== 0
 			)
 				return false;
 		} else if (player === "b") {
 			if (
 				(delta_pos === 2
-					? boardState.right_black_rook_has_moved
-					: boardState.left_black_rook_has_moved) !== 0
+					? boardState.rightBlackRookHasMoved
+					: boardState.leftBlackRookHasMoved) !== 0
 			)
 				return false;
 		}
