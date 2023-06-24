@@ -348,21 +348,17 @@ export default class Board extends React.Component<any, IStateBoard> {
 	}
 
 	private handleSecondClick(i: number, squares: PieceType[]) {
-		// ця змінна true, якщо гравець на другому натисканні вибрав його фігуру
 		const isPlayerPiece = squares[i].player === this.state.turn;
 
-		// this.state.source !== i перевіряє чи не натиснув гравець на його ж фігуру ще раз (інакше рокіровка, або може є ще щось, не знаю)
-		if (isPlayerPiece === true && this.state.source !== i) {
+		if (isPlayerPiece && this.state.source !== i) {
 			this.handleSamePieceTwice(i, squares);
 		}
+		else if (!this.referee.pieceCanMoveThere(this.state.source, i, squares, this.state)) {
+			this.handleInvalidMove(i, squares);
+		}
 		else {
-			if (!this.referee.pieceCanMoveThere(this.state.source, i, squares, this.state)) {
-				this.handleInvalidMove(i, squares);
-			}
-			else {
-				this.movePiece(this.state.turn, squares, this.state.source, i);
-				this.runBot();
-			}
+			this.movePiece(this.state.turn, squares, this.state.source, i);
+			this.runBot();
 		}
 	}
 
