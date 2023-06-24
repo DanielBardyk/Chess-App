@@ -37,7 +37,7 @@ export interface IStateBoard {
 	againstBot: boolean,
 	botFirstMove: boolean,
 	mated: boolean,
-	check_flash: boolean,
+	checkHighlighted: boolean,
 	just_clicked: boolean,
 	key: number
 };
@@ -95,7 +95,7 @@ export default class Board extends React.Component<any, IStateBoard> {
 			againstBot: false,
 			botFirstMove: false,
 			mated: false,
-			check_flash: false,
+			checkHighlighted: false,
 			just_clicked: false,
 			key: 0
 		};
@@ -134,7 +134,7 @@ export default class Board extends React.Component<any, IStateBoard> {
 			settingWayChoosed: false,
 			againstBot: false,
 			mated: false,
-			check_flash: false,
+			checkHighlighted: false,
 			just_clicked: false,
 			key: 0
 		});
@@ -291,28 +291,22 @@ export default class Board extends React.Component<any, IStateBoard> {
 	}
 
 	private handleFirstClick(i: number, squares: PieceType[]) {
-		// якщо гравець першим натиcканням обрав фігуру опонента, то не перерендерювати нічого, вийти просто
-		if (squares[i].player !== this.state.turn) return -1;
+		if (squares[i].player !== this.state.turn) return 1;
 
-		// якщо не намагається взяти щось з поля, де нема фігури. То заходимо в if
 		if (squares[i].player !== null) {
 			this.setState({
-				check_flash: false,
+				checkHighlighted: false,
 				just_clicked: false,
 			});
 
-			// бере фігуру, тому прибираємо підсвітку, що позначає "шах"
 			squares = [...this.highlighter.clearCheckHighlight(squares, this.state.turn)];
-			// і підсвічуємо фігуру, що взята
 			squares[i].highlight = 1;
 
-			// підсвічуємо куди можна піти
 			for (let j = 0; j < 64; j++) {
 				if (this.referee.pieceCanMoveThere(i, j, squares, this.state))
 				squares[j].possible = 1;
 			}
 
-			// встановлюємо source як поле, на яке натиснув гравець і копіюмо поточний стан дошки
 			this.setState({
 				source: i,
 				squares: squares,
@@ -320,54 +314,52 @@ export default class Board extends React.Component<any, IStateBoard> {
 		}
 	}
 
+	private highlightCheck(squares: PieceType[]) {
+		for (let j = 0; j < 64; j++) {
+			if ((this.state.turn === "w" && squares[j].id === "k")
+				|| (this.state.turn === "b" && squares[j].id === "K")) {
+				let king = squares[j] as King;
+				king.inCheck = 1;
+				squares[j] = king;
+				break;
+			}
+		}
+	}
+
+	private handleSamePieceTwice(i: number, squares: PieceType[]) {
+		squares[i].highlight = 1;
+		squares[this.state.source].highlight = 0;
+		squares = [...this.highlighter.clearPossibleMoveHighlight(squares)];
+		
+		for (let j = 0; j < 64; j++) {
+			if (this.referee.pieceCanMoveThere(i, j, squares, this.state))
+			squares[j].possible = 1;
+		}
+
+		this.setState({
+			source: i,
+			squares: squares,
+		});
+	}
+
 	private handleSecondClick(i: number, squares: PieceType[]) {
 		// ця змінна true, якщо гравець на другому натисканні вибрав його фігуру
-		var isPlayerPiece = squares[i].player === this.state.turn;
+		const isPlayerPiece = squares[i].player === this.state.turn;
 
 		// this.state.source !== i перевіряє чи не натиснув гравець на його ж фігуру ще раз (інакше рокіровка, або може є ще щось, не знаю)
 		if (isPlayerPiece === true && this.state.source !== i) {
-			// підсвічуємо нове обране поле
-			squares[i].highlight = 1;
-			// прибираємо підсвітку з поля, яке було вибране спочатку
-			squares[this.state.source].highlight = 0;
-			// прибираємо підсвітку для всіх полів, куди можна зробити хід, бо після ходу вони зміняться
-			squares = [...this.highlighter.clearPossibleMoveHighlight(squares)];
-			// підсвічуємо ходи, які тепер можна зробити, після цього ходу
-			for (let j = 0; j < 64; j++) {
-				if (this.referee.pieceCanMoveThere(i, j, squares, this.state))
-				squares[j].possible = 1;
-			}
-			// встановлюємо source на поле, на яке було натиснуто
-			this.setState({
-				source: i,
-				squares: squares,
-			});
-			// рокіровка (або може є ще щось, не знаю)
-		} else {
+			this.handleSamePieceTwice(i, squares);
+		} else { // рокіровка
 			if(!this.state.botFirstMove) {
-				// Якщо не можна зробити рокіровку то треба додати підсвітку і змінити певні пропси
+				// Якщо хід зробити неможливо то треба змінити підсвітку
 				if (!this.referee.pieceCanMoveThere(this.state.source, i, squares, this.state)) {
-					// не підсвічуати поля, якщо обрано неможливий хід
 					squares[this.state.source].highlight = 0;
 					squares = [...this.highlighter.clearPossibleMoveHighlight(squares)];
-					// якщо користувач під шахом, виділіть короля червоним кольором, якщо користувач намагається зробити хід, який не виведе його з шаху
-					if (
-						// означає, що друге натиснення і король під шахом
-						i !== this.state.source &&
-						this.referee.inCheck(this.state.turn, squares, this.state) === true
-					) {
-						for (let j = 0; j < 64; j++) {
-							if ((this.state.turn === "w" && squares[j].id === "k")
-								|| (this.state.turn === "b" && squares[j].id === "K")) {
-								let king = squares[j] as King;
-								king.inCheck = 1;
-								squares[j] = king;
-								break;
-							}
-						}
-						// індикує що шах підсвічено
+					// якщо хід не виводить із шаху підсвічуємо
+					if (i !== this.state.source && this.referee.inCheck(this.state.turn, squares, this.state)) {
+						this.highlightCheck(squares);
 						this.setState({
-							check_flash: true,
+							checkHighlighted: true,
 						});
 					}
 					// source: -1 відміняє попередні натискання, через те що рокіровка неможлива. Тепер користувач повинен знову зробити два натискання
@@ -377,11 +369,10 @@ export default class Board extends React.Component<any, IStateBoard> {
 					});
 					return "invalid move";
 				}
-					// функція реалізує переміщення фігури
-					this.movePiece(this.state.turn, squares, this.state.source, i);
-				}
 
-			// виклик бота
+				this.movePiece(this.state.turn, squares, this.state.source, i);
+			}
+
 			if (this.state.againstBot) {
 				let search_depth = 3;
 				setTimeout(() => {
@@ -395,6 +386,7 @@ export default class Board extends React.Component<any, IStateBoard> {
 						this.movePiece.bind(this));
 				}, 700);
 			}
+			
 			if (this.state.botFirstMove) {
 				this.setState({
 					botFirstMove: false
