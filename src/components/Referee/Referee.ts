@@ -200,6 +200,15 @@ export default class Referee {
 		return passantTrue ? end : 65;
 	}
 
+	public checkForMateStatus(squares: PieceType[], player: "w" | "b", boardState: IStateBoard) {
+		const checkMated =
+			this.checkmate("w", squares, boardState) || this.checkmate("b", squares, boardState);
+		const staleMated =
+			(this.stalemate("w", squares, boardState) && player === "b") ||
+			(this.stalemate("b", squares, boardState) && player === "w");
+		return { checkMated, staleMated };
+	}
+
 	public stalemate(player: "w" | "b", squares: PieceType[], boardState: IStateBoard) {
 		if (this.inCheck(player, squares, boardState)) return false;
 

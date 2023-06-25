@@ -144,6 +144,18 @@ export default class Board extends React.Component<any, IStateBoard> {
 		}
 	}
 
+	private highlightMateHelper(squares: PieceType[], player: string) {
+		const opponent = player === "w" ? "b" : "w";
+		return (
+			this.highlighter.highlightMate(
+				opponent,
+				squares,
+				this.referee.checkmate(opponent, squares, this.state),
+				this.referee.stalemate(opponent, squares, this.state)
+			)
+		);
+	}
+
 	private updateRookHasMoved(player: "w" | "b", start: number) {
 		if (start === (player === "w" ? 56 : 0)) {
 			if (player === "w") {
@@ -188,27 +200,9 @@ export default class Board extends React.Component<any, IStateBoard> {
 
 		const passant = this.referee.checkMoveForPassant(player, copySquares, start, end);
 
-		if (player === "w") {
-			copySquares = [...this.highlighter.highlightMate(
-				"b",
-				copySquares,
-				this.referee.checkmate("b", copySquares, this.state),
-				this.referee.stalemate("b", copySquares, this.state)
-			)];
-		} else {
-			copySquares = [...this.highlighter.highlightMate(
-				"w",
-				copySquares,
-				this.referee.checkmate("w", copySquares, this.state),
-				this.referee.stalemate("w", copySquares, this.state)
-			)];
-		}
+		this.highlightMateHelper(copySquares, player);
 
-		let checkMated =
-			this.referee.checkmate("w", copySquares, this.state) || this.referee.checkmate("b", copySquares, this.state);
-		let staleMated =
-			(this.referee.stalemate("w", copySquares, this.state) && player === "b") ||
-			(this.referee.stalemate("b", copySquares, this.state) && player === "w");
+		const { checkMated, staleMated } = this.referee.checkForMateStatus(copySquares, player, this.state);
 
 		this.setState({
 			passantPos: passant,
@@ -305,7 +299,7 @@ export default class Board extends React.Component<any, IStateBoard> {
 
 		// якщо хід не виводить із шаху підсвічуємо
 		if (i !== this.state.source && this.referee.inCheck(this.state.turn, squares, this.state)) {
-			this.highlighter.highlightCheck(squares, this.state.turn);
+			squares = this.highlighter.highlightCheck(squares, this.state.turn);
 		}
 
 		this.setState({
