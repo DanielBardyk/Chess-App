@@ -34,12 +34,12 @@ export default class Board extends React.Component<IBoardProps, IStateBoard> {
 			firstPos: 0,
 			secondPos: 0,
 			repetition: 0,
-			whiteKingHasMoved: 0,
-			blackKingHasMoved: 0,
-			leftBlackRookHasMoved: 0,
-			rightBlackRookHasMoved: 0,
-			leftWhiteRookHasMoved: 0,
-			rightWhiteRookHasMoved: 0,
+			whiteKingHasMoved: false,
+			blackKingHasMoved: false,
+			leftBlackRookHasMoved: false,
+			rightBlackRookHasMoved: false,
+			leftWhiteRookHasMoved: false,
+			rightWhiteRookHasMoved: false,
 			passantPos: 65,
 			error: null,
 			botRunning: false,
@@ -62,7 +62,7 @@ export default class Board extends React.Component<IBoardProps, IStateBoard> {
 			&& this.state.turn === "b"
 			&& !this.state.mated
 		)
-			return "cannot reset";
+			return;
 
 		this.setState({
 			squares: this.boardManager.initializeEmptyBoard(),
@@ -71,12 +71,12 @@ export default class Board extends React.Component<IBoardProps, IStateBoard> {
 			firstPos: 0,
 			secondPos: 0,
 			repetition: 0,
-			whiteKingHasMoved: 0,
-			blackKingHasMoved: 0,
-			leftBlackRookHasMoved: 0,
-			rightBlackRookHasMoved: 0,
-			leftWhiteRookHasMoved: 0,
-			rightWhiteRookHasMoved: 0,
+			whiteKingHasMoved: false,
+			blackKingHasMoved: false,
+			leftBlackRookHasMoved: false,
+			rightBlackRookHasMoved: false,
+			leftWhiteRookHasMoved: false,
+			rightWhiteRookHasMoved: false,
 			passantPos: 65,
 			error: null,
 			botRunning: false,
@@ -94,11 +94,11 @@ export default class Board extends React.Component<IBoardProps, IStateBoard> {
 	private updateKingHasMoved(player: "w" | "b") {
 		if (player === "w") {
 			 this.setState({
-				whiteKingHasMoved: 1,
+				whiteKingHasMoved: true,
 			});
 		} else {
 			 this.setState({
-				blackKingHasMoved: 1,
+				blackKingHasMoved: true,
 			});
 		}
 	}
@@ -119,21 +119,21 @@ export default class Board extends React.Component<IBoardProps, IStateBoard> {
 		if (start === (player === "w" ? 56 : 0)) {
 			if (player === "w") {
 				this.setState({
-					leftWhiteRookHasMoved: 1,
+					leftWhiteRookHasMoved: true,
 				});
 			} else {
 				this.setState({
-					leftBlackRookHasMoved: 1,
+					leftBlackRookHasMoved: true,
 				});
 			}
 		} else if (start === (player === "w" ? 63 : 7)) {
 			if (player === "w") {
 				this.setState({
-					rightWhiteRookHasMoved: 1,
+					rightWhiteRookHasMoved: true,
 				});
 			} else {
 				this.setState({
-					rightBlackRookHasMoved: 1,
+					rightBlackRookHasMoved: true,
 				});
 			}
 		}
@@ -280,6 +280,7 @@ export default class Board extends React.Component<IBoardProps, IStateBoard> {
 		}
 		else {
 			this.movePiece(this.state.turn, squares, this.state.source, i);
+			if(this.state.mated) return;
 			this.runBot();
 		}
 	}
@@ -290,8 +291,7 @@ export default class Board extends React.Component<IBoardProps, IStateBoard> {
 			setTimeout(() => {
 				this.bot.execute(
 					searchDepth, 
-					this.state.squares, 
-					this.state.mated,
+					this.state.squares,
 					this.state.firstPos,
 					this.state.secondPos,
 					this.state, 

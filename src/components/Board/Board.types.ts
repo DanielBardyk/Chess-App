@@ -10,15 +10,15 @@ export interface IStateBoard {
 	selectedPiece: PanelType | null;
 	source: number,
 	turn: "w" | "b",
-	firstPos: number, // Bot
-	secondPos: number, // Bot
-	repetition: number, // Bot
-	whiteKingHasMoved: number, // Referee
-	blackKingHasMoved: number, // Referee
-	leftBlackRookHasMoved: number, // Referee
-	rightBlackRookHasMoved: number, // Referee
-	leftWhiteRookHasMoved: number, // Referee
-	rightWhiteRookHasMoved: number, // Referee
+	firstPos: number,
+	secondPos: number,
+	repetition: number,
+	whiteKingHasMoved: boolean,
+	blackKingHasMoved: boolean,
+	leftBlackRookHasMoved: boolean,
+	rightBlackRookHasMoved: boolean,
+	leftWhiteRookHasMoved: boolean,
+	rightWhiteRookHasMoved: boolean,
 	passantPos: number,
 	error: string | null,
 	botRunning: boolean,

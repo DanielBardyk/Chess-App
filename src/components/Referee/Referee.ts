@@ -83,28 +83,18 @@ export default class Referee {
 				: copySquares[end - 2].id) !== (player === "w" ? "r" : "R")
 		)
 			return false;
-		if (
-			(player === "w"
-				? boardState.whiteKingHasMoved
-				: boardState.blackKingHasMoved) !== 0
-		)
+		if (player === "w" ? boardState.whiteKingHasMoved : boardState.blackKingHasMoved) {
 			return false;
-		if (player === "w") {
-			if (
-				(deltaPos === 2
-					? boardState.rightWhiteRookHasMoved
-					: boardState.leftWhiteRookHasMoved) !== 0
-			)
-				return false;
-		} else if (player === "b") {
-			if (
-				(deltaPos === 2
-					? boardState.rightBlackRookHasMoved
-					: boardState.leftBlackRookHasMoved) !== 0
-			)
-				return false;
 		}
-
+		if (player === "w") {
+			if (deltaPos === 2 ? boardState.rightWhiteRookHasMoved : boardState.leftWhiteRookHasMoved) {
+				return false;
+			}
+		} else if (player === "b") {
+			if (deltaPos === 2 ? boardState.rightBlackRookHasMoved : boardState.leftBlackRookHasMoved) {
+				return false;
+			}
+		}
 		return true;
 	}
 

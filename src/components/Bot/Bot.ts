@@ -115,14 +115,11 @@ export default class Bot extends Player {
 
 	public execute(depth: number,
 		passedInSquares: PieceType[],
-		mated: boolean,
 		firstPos: number,
 		secondPos: number,
 		boardState: IStateBoard,
 		movePiece: (player: "b" | "w", squares: PieceType[], start: number, end: number) => void)
 	{
-		if (mated) return;
-
 		const copySquares = [...passedInSquares];
 
 		const { raOfStarts, raOfEnds } = this.generateRandomPositions();
