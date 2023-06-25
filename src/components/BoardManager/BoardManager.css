@@ -1,0 +1,19 @@
+.label_piece_selection {
+	outline: none !important;
+	background-color: transparent;
+	color: #deeaee;
+	border: none;
+	font-size: 100%;
+	height: 8vmin;
+	width: 8vmin;
+}
+
+.label {
+	outline: none !important;
+	background-color: transparent;
+	color: #deeaee;
+	border: none;
+	font-size: 120%;
+	height: 10vmin;
+	width: 10vmin;
+ }

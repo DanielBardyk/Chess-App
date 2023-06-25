@@ -1,5 +1,5 @@
 import { IStateBoard } from "../Board/BoardTypes";
-import { PanelType } from "../BoardManager/BoardManagerTypes";
+import { PanelType } from "../BoardManager/BoardManager.types";
 import { King, PieceType } from "../Pieces/Pieces";
 
 export default class StylesCalculator {

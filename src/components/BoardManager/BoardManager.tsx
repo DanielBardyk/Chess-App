@@ -2,7 +2,7 @@ import { PieceCleaner } from "../PieceCleaner/PieceCleaner";
 import { Pawn, King, Queen, Bishop, Knight, Rook, PieceFiller } from "../Pieces/Pieces"
 import Label from "../Label/Label";
 import { IStateBoard } from "../Board/BoardTypes";
-import { PanelType } from "./BoardManagerTypes";
+import { PanelType } from "./BoardManager.types";
 	
 export default class BoardManager {
 	public initializeEmptyBoard() {
@@ -85,19 +85,16 @@ export default class BoardManager {
 	}
 
 	public copyPanelPiece(selectedPiece: PanelType) {
-		const pieceId = selectedPiece?.id;
-		if (pieceId === "k") return new King("w");
-		else if (pieceId === "K") return new King("b");
-		else if (pieceId === "q") return new Queen("w");
-		else if (pieceId === "Q") return new Queen("b");
-		else if (pieceId === "b") return new Bishop("w");
-		else if (pieceId === "B") return new Bishop("b");
-		else if (pieceId === "n") return new Knight("w");
-		else if (pieceId === "N") return new Knight("b");
-		else if (pieceId === "r") return new Rook("w");
-		else if (pieceId === "R") return new Rook("b");
-		else if (pieceId === "p") return new Pawn("w");
-		else return new Pawn("b");
+		const player = selectedPiece.player as "w" | "b";
+		
+		if (selectedPiece.id) {
+			if (selectedPiece.id.toLowerCase() === "k") return new King(player);
+			else if (selectedPiece.id.toLowerCase() === "q") return new Queen(player);
+			else if (selectedPiece.id.toLowerCase() === "b") return new Bishop(player);
+			else if (selectedPiece.id.toLowerCase() === "n") return new Knight(player);
+			else if (selectedPiece.id.toLowerCase() === "r") return new Rook(player);
+			else return new Pawn(player);
+		}
 	}
 
 	public createTrainingPiecesArray(player: "w" | "b") {

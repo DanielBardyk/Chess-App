@@ -1,4 +1,4 @@
-import { ISquareProps } from "../SquareRenderer/SquareRendererTypes";
+import { ISquareProps } from "../SquareRenderer/SquareRenderer.types";
 
 export function Square(props: ISquareProps) {
 	if (props.value != null) {

@@ -9,7 +9,7 @@ import Bot from "../Bot/Bot";
 import Player from "../Player/Player";
 import { IBoardProps, IStateBoard, IStateSerialized } from "./BoardTypes";
 import StylesCalculator from "../StylesCalculator/StylesCalculator";
-import { PanelType } from "../BoardManager/BoardManagerTypes";
+import { PanelType } from "../BoardManager/BoardManager.types";
 
 export default class Board extends React.Component<any, IStateBoard> {
 	private boardManager: BoardManager = new BoardManager();
@@ -349,7 +349,7 @@ export default class Board extends React.Component<any, IStateBoard> {
 			return;
 		}
 		else if (this.state.selectedPiece.id !== "c") {
-			checkedSquares[i] = this.boardManager.copyPanelPiece(this.state.selectedPiece);
+			checkedSquares[i] = this.boardManager.copyPanelPiece(this.state.selectedPiece) as PieceType;
 			const secondPlayer = this.state.turn === "w" ? "b" : "w";
 			
 			if (this.referee.inCheck(secondPlayer, checkedSquares, this.state)) {
@@ -358,7 +358,7 @@ export default class Board extends React.Component<any, IStateBoard> {
 		}
 		
 		if(this.state.selectedPiece.id !== "c") {
-			squares[i] = this.boardManager.copyPanelPiece(this.state.selectedPiece);
+			squares[i] = this.boardManager.copyPanelPiece(this.state.selectedPiece) as PieceType;
 		}
 
 		this.setState({

@@ -1,4 +1,4 @@
-import { PanelType } from "../BoardManager/BoardManagerTypes";
+import { PanelType } from "../BoardManager/BoardManager.types";
 import { PieceType } from "../Pieces/Pieces";
 
 export interface ISquareProps {
