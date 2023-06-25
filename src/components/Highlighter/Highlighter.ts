@@ -1,5 +1,4 @@
-import { PieceType } from "../Board/Board";
-import { King } from "../Pieces/Pieces";
+import { King, PieceType } from "../Pieces/Pieces";
 
 export default class Highlighter {
 

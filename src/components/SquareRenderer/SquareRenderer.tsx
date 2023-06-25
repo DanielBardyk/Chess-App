@@ -1,5 +1,5 @@
-import { PieceType } from "../Board/Board";
 import { PanelType } from "../BoardManager/BoardManager";
+import { PieceType } from "../Pieces/Pieces";
 import { Square } from "../Square/Square";
 
 export interface ISquareProps {

@@ -1,5 +1,4 @@
-import { PieceType } from "../Board/Board";
-import { PieceFiller, Queen } from "../Pieces/Pieces";
+import { PieceFiller, PieceType, Queen } from "../Pieces/Pieces";
 
 export default class Player {
 

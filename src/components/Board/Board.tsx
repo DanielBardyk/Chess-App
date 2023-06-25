@@ -1,5 +1,5 @@
 import React from "react";
-import { Pawn, King, Queen, Bishop, Knight, Rook, PieceFiller } from "../Pieces/Pieces"
+import { Pawn, King, Queen, Bishop, Knight, Rook, PieceFiller, PieceType } from "../Pieces/Pieces"
 import Saver from "../Saver/Saver";
 import BoardManager, { PanelType } from "../BoardManager/BoardManager";
 import Highlighter from "../Highlighter/Highlighter";
@@ -7,51 +7,8 @@ import SquareRenderer from "../SquareRenderer/SquareRenderer";
 import Referee from "../Referee/Referee";
 import Bot from "../Bot/Bot";
 import Player from "../Player/Player";
-
-export type PieceType = Pawn | King | Queen | Bishop | Knight | Rook | PieceFiller
-
-export interface IStateBoard {
-	squares: PieceType[],
-	blackPanel: PanelType[],
-	whitePanel: PanelType[],
-	selectedPiece: PanelType | null;
-	source: number,
-	turn: "w" | "b",
-	firstPos: number, // Bot
-	secondPos: number, // Bot
-	repetition: number, // Bot
-	whiteKingHasMoved: number, // Referee
-	blackKingHasMoved: number, // Referee
-	leftBlackRookHasMoved: number, // Referee
-	rightBlackRookHasMoved: number, // Referee
-	leftWhiteRookHasMoved: number, // Referee
-	rightWhiteRookHasMoved: number, // Referee
-	passantPos: number,
-	error: string | null,
-	botRunning: boolean,
-	firstRender: boolean,
-	gameStarted: boolean,
-	piecesSelection: boolean,
-	playerSelection: boolean,
-	settingWayChoosed: boolean,
-	againstBot: boolean,
-	mated: boolean,
-	key: number
-};
-
-interface IBoardProps {
-	squareRenderer: SquareRenderer;
-	saver: Saver;
-}
-
-interface ISquaresSerialized {
-	name: string, player: 'w' | 'b' | null
-}
-
-// Omit це службовий тип для перетворення одного інтерфейсу в інший, другим параметром якого передається властивість, яку треба видалити
-export interface IStateSerialized extends Omit<IStateBoard, "squares"> {
-	squares: ISquaresSerialized[]
-}
+import { IBoardProps, IStateBoard, IStateSerialized } from "./BoardTypes";
+import StylesCalculator from "../StylesCalculator/StylesCalculator";
 
 export default class Board extends React.Component<any, IStateBoard> {
 	private boardManager: BoardManager = new BoardManager();
@@ -60,6 +17,7 @@ export default class Board extends React.Component<any, IStateBoard> {
 	private squareRenderer: SquareRenderer;
 	private bot: Bot;
 	private highlighter: Highlighter = new Highlighter();
+	private stylesCalculator: StylesCalculator = new StylesCalculator();
 
 	constructor(props: IBoardProps) {
 		super(props);
@@ -263,11 +221,27 @@ export default class Board extends React.Component<any, IStateBoard> {
 
 		if (squares[i].player !== null) {
 			squares = this.highlighter.clearCheckHighlight(squares, this.state.turn);
+
+			// console.log("value of i: " + i);
+
+			/* for (let j = 0; j < 64; j++) {
+				console.log(j + " highlight: " + squares[j].highlight);
+			} */
+
+			// console.log(squares[i]);
+
+			console.log(squares);
 			squares[i].highlight = 1;
 
+			// for (let j = 0; j < 64; j++) {
+			// 	console.log(j + " highlight 2: " + squares[j].highlight);
+			// }
+
 			for (let j = 0; j < 64; j++) {
-				if (this.referee.pieceCanMoveThere(i, j, squares, this.state))
-				squares[j].possible = 1;
+				if (this.referee.pieceCanMoveThere(i, j, squares, this.state)) {
+					squares[j].possible = 1;
+				}
+				// console.log(j + " possible: " + squares[j].possible);
 			}
 
 			this.setState({
@@ -374,7 +348,7 @@ export default class Board extends React.Component<any, IStateBoard> {
 			return;
 		}
 		else if (this.state.selectedPiece.id !== "c") {
-			checkedSquares[i] = this.state.selectedPiece as PieceType;
+			checkedSquares[i] = this.boardManager.copyPanelPiece(this.state.selectedPiece);
 			const secondPlayer = this.state.turn === "w" ? "b" : "w";
 			
 			if (this.referee.inCheck(secondPlayer, checkedSquares, this.state)) {
@@ -383,7 +357,7 @@ export default class Board extends React.Component<any, IStateBoard> {
 		}
 		
 		if(this.state.selectedPiece.id !== "c") {
-			squares[i] = this.state.selectedPiece as PieceType;
+			squares[i] = this.boardManager.copyPanelPiece(this.state.selectedPiece);
 		}
 
 		this.setState({
@@ -414,10 +388,10 @@ export default class Board extends React.Component<any, IStateBoard> {
 			const squareRows = [];
 			for (let j = 0; j < 8; j++) {
 
-				const squareCorner = this.boardManager.calcSquareCorner(i, j);
+				const squareCorner = this.stylesCalculator.calcSquareCorner(i, j);
 				const copySquares = [...this.state.squares];
-				const squareColor = this.boardManager.calcSquareColor(i, j, copySquares);
-				const squareCursor = this.boardManager.calcSquareCursor(i, j, copySquares, this.state);
+				const squareColor = this.stylesCalculator.calcSquareColor(i, j, copySquares);
+				const squareCursor = this.stylesCalculator.calcSquareCursor(i, j, copySquares, this.state);
 				const squareSize = this.state.piecesSelection ? "square_piece_selection " : "square ";
 
 				squareRows.push(
@@ -441,20 +415,19 @@ export default class Board extends React.Component<any, IStateBoard> {
 		return board;
 	}
 
-	// рендеринг панелі для вибору фігур у тренувальному режимі
 	private renderPanel(player: "w" | "b") {
 		const panelElements = player === "w" ? this.state.whitePanel : this.state.blackPanel; 
 		let piecesArray: JSX.Element[] = [];
 
 		for (let i=0; i < 7; i++) {
-			const squareCorner = this.boardManager.calcPanelSquareCorner(i, player);
+			const squareCorner = this.stylesCalculator.calcPanelSquareCorner(i, player);
 
 			piecesArray.push(
 				this.squareRenderer.showSquare({
 					key: i,
 					value: panelElements[i],
 					size: "square_piece_selection ",
-					color: this.boardManager.calcColorTrainingPiece(panelElements[i], this.state),
+					color: this.stylesCalculator.calcColorTrainingPiece(panelElements[i], this.state),
 					corner: squareCorner,
 					cursor: "pointer",
 					onClick: () => {

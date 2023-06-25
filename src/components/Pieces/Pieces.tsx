@@ -11,6 +11,8 @@ import WhitePawnImage from '../../assets/images/white_pawn.png'
 import WhiteRookImage from '../../assets/images/white_rook.png'
 import BlackRookImage from '../../assets/images/black_rook.png'
 
+export type PieceType = Pawn | King | Queen | Bishop | Knight | Rook | PieceFiller
+
 export abstract class Piece {
 	protected _highlight: number;
 	protected _possible: number;

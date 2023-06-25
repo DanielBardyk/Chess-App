@@ -1,4 +1,4 @@
-import { PieceType } from "../Board/Board";
+import { PieceType } from "../Pieces/Pieces";
 
 export default class PieceEvaluator {
 	private reverseForBlack(array: number[][]) {

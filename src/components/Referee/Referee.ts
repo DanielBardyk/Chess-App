@@ -1,5 +1,5 @@
-import { IStateBoard, PieceType } from "../Board/Board";
-import { PieceFiller, Queen } from "../Pieces/Pieces";
+import { IStateBoard } from "../Board/BoardTypes";
+import { PieceFiller, PieceType, Queen } from "../Pieces/Pieces";
 
 export default class Referee {
 

@@ -1,6 +1,7 @@
-import { IStateBoard, PieceType } from "../Board/Board";
+import { IStateBoard } from "../Board/BoardTypes";
 import BotEngine from "../BotEngine/BotEngine";
 import PieceEvaluator from "../PieceEvaluator/PieceEvaluator";
+import { PieceType } from "../Pieces/Pieces";
 import Player from "../Player/Player";
 import Referee from "../Referee/Referee";
 
