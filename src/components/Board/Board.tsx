@@ -11,7 +11,7 @@ import StylesCalculator from "../StylesCalculator/StylesCalculator";
 import { PanelType } from "../BoardManager/BoardManager.types";
 import { IBoardProps, IStateBoard, IStateSerialized } from "./Board.types";
 
-export default class Board extends React.Component<any, IStateBoard> {
+export default class Board extends React.Component<IBoardProps, IStateBoard> {
 	private boardManager: BoardManager = new BoardManager();
 	private referee: Referee;
 	private saver: Saver;
