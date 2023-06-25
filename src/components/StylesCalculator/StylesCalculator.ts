@@ -29,7 +29,7 @@ export default class StylesCalculator {
 
 	public calcColorTrainingPiece(piece: PanelType, boardState: IStateBoard) {
 		if(boardState.selectedPiece === piece) {
-			return "selected_square "
+			return "highlighted_square "
 		} else {
 			return "training_piece_square "
 		}

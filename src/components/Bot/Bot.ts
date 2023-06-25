@@ -78,44 +78,6 @@ export default class Bot extends Player {
 		return { randStart, randEnd }
 	}
 
-	public executeBot(depth: number,
-			passedInSquares: PieceType[],
-			mated: boolean,
-			firstPos: number,
-			secondPos: number,
-			boardState: IStateBoard,
-			movePiece: (player: "b" | "w", squares: PieceType[], start: number, end: number) => void)
-		{
-		if (mated) return;
-
-		const copySquares = [...passedInSquares];
-
-		const { raOfStarts, raOfEnds } = this.generateRandomPositions();
-
-		const moves = this.generateMoves(copySquares, raOfStarts, raOfEnds, boardState);
-
-		const { randStart, randEnd } = this.findBestMove(
-			moves, 
-			firstPos, 
-			secondPos, 
-			passedInSquares, 
-			boardState, 
-			depth, 
-			raOfStarts, 
-			raOfEnds
-		);
-
-		// Якщо бот не отримав мат
-		if (randEnd !== 100) {
-			if (randStart === secondPos && randEnd === firstPos) {
-				this.repetition += 1;
-			} else {
-				this.repetition = 0
-			}
-			movePiece("b", copySquares, randStart, randEnd);
-		}
-	}
-
 	private generateRandomPositions() {
 		let raOfStarts = [];
 		let raOfEnds = [];
@@ -149,5 +111,43 @@ export default class Bot extends Player {
 		  }
 		}
 		return moves;
+	}
+
+	public execute(depth: number,
+		passedInSquares: PieceType[],
+		mated: boolean,
+		firstPos: number,
+		secondPos: number,
+		boardState: IStateBoard,
+		movePiece: (player: "b" | "w", squares: PieceType[], start: number, end: number) => void)
+	{
+		if (mated) return;
+
+		const copySquares = [...passedInSquares];
+
+		const { raOfStarts, raOfEnds } = this.generateRandomPositions();
+
+		const moves = this.generateMoves(copySquares, raOfStarts, raOfEnds, boardState);
+
+		const { randStart, randEnd } = this.findBestMove(
+			moves, 
+			firstPos, 
+			secondPos, 
+			passedInSquares, 
+			boardState, 
+			depth, 
+			raOfStarts, 
+			raOfEnds
+		);
+
+		// Якщо бот не отримав мат
+		if (randEnd !== 100) {
+			if (randStart === secondPos && randEnd === firstPos) {
+				this.repetition += 1;
+			} else {
+				this.repetition = 0
+			}
+			movePiece("b", copySquares, randStart, randEnd);
+		}
 	}
 }

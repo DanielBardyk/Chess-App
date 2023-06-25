@@ -267,7 +267,6 @@ export default class Board extends React.Component<any, IStateBoard> {
 			source: -1,
 			squares: squares,
 		});
-		return "invalid move";
 	}
 
 	private handleSecondClick(i: number, squares: PieceType[]) {
@@ -289,7 +288,7 @@ export default class Board extends React.Component<any, IStateBoard> {
 		if (this.state.againstBot) {
 			let searchDepth = 3;
 			setTimeout(() => {
-				this.bot.executeBot(
+				this.bot.execute(
 					searchDepth, 
 					this.state.squares, 
 					this.state.mated,
@@ -361,7 +360,7 @@ export default class Board extends React.Component<any, IStateBoard> {
 		if(this.state.piecesSelection) {
 			this.handlePieceSelection(i, copySquares);
 		} else if (this.state.mated) {
-			return "game-over"
+			return;
 		} else if (this.state.source === -1 && !this.state.botRunning) {
 			this.handleFirstClick(i, copySquares);
 		} else if (this.state.source > -1) {
@@ -418,7 +417,7 @@ export default class Board extends React.Component<any, IStateBoard> {
 					corner: squareCorner,
 					cursor: "pointer_cursor",
 					onClick: () => {
-						this.handlePanelPieceChoose(panelElements[i])
+						this.handlePanelPieceChoose(panelElements[i]);
 					}
 				})
 			)
