@@ -101,7 +101,7 @@ export default class Bot extends Player {
 				// робимо хід
 				const testSquares2 = [...this.makePossibleMove(testSquares, start, end, boardState.passantPos)];
 				// для взяття на проході
-				var passantPos = 65;
+				let passantPos = 65;
 				if (
 					testSquares[start].id === "P" &&
 					start >= 8 &&

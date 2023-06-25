@@ -56,7 +56,7 @@ export default class BotEngine {
 						)];
 						// перевіряє, чи зроблений хід є взяттям на проході. Це треба для ф-ії pieceCanMoveThere (без цього вона б оцінювала взяття на прохід як неможливий хід).
 						// якщо це значення не зміниться, то ф-ія pieceCanMoveThere буде знати, що даний рух, який перевіряється, не є взяттям на проході
-						var passant = 65;
+						let passant = 65;
 						// якщо цей хід був взяттям на проході, то passant = end
 						if (
 							testSquares[end].id === (isBlackPlayer ? "P" : "p") &&

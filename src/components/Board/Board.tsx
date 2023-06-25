@@ -262,7 +262,7 @@ export default class Board extends React.Component<any, IStateBoard> {
 		if (squares[i].player !== this.state.turn) return 1;
 
 		if (squares[i].player !== null) {
-			squares = [...this.highlighter.clearCheckHighlight(squares, this.state.turn)];
+			squares = this.highlighter.clearCheckHighlight(squares, this.state.turn);
 			squares[i].highlight = 1;
 
 			for (let j = 0; j < 64; j++) {

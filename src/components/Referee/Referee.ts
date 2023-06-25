@@ -4,13 +4,13 @@ import { PieceFiller, Queen } from "../Pieces/Pieces";
 export default class Referee {
 
 	private goodPawn(start: number, end: number, squares: PieceType[], boardState: IStateBoard, passantPos: number | null = null) {
-		var passant = passantPos === null ? boardState.passantPos : passantPos;
-		var startRow = 8 - Math.floor(start / 8);
-		var startCol = (start % 8) + 1;
-		var endRow = 8 - Math.floor(end / 8);
-		var endCol = (end % 8) + 1;
-		var rowDiff = endRow - startRow;
-		var colDiff = endCol - startCol;
+		const passant = passantPos === null ? boardState.passantPos : passantPos;
+		const startRow = 8 - Math.floor(start / 8);
+		const startCol = (start % 8) + 1;
+		const endRow = 8 - Math.floor(end / 8);
+		const endCol = (end % 8) + 1;
+		const rowDiff = endRow - startRow;
+		const colDiff = endCol - startCol;
 		const copySquares = [...squares];
 
 		if (rowDiff === 2 || rowDiff === -2) {
@@ -50,7 +50,7 @@ export default class Referee {
 
 	private isMoveInvalid(start: number, end: number, squares: PieceType[], boardState: IStateBoard, passantPos: number | null = null) {
 		const copySquares: PieceType[] = [...squares];
-		var bqrpk =
+		const bqrpk =
 			copySquares[start].id?.toLowerCase() === "r" ||
 			copySquares[start].id?.toLowerCase() === "q" ||
 			copySquares[start].id?.toLowerCase() === "b" ||
@@ -60,13 +60,13 @@ export default class Referee {
 			bqrpk === true && this.blockersExist(start, end, copySquares) === true;
 		if (invalid) return invalid;
 
-		var pawn = copySquares[start].id?.toLowerCase() === "p";
+		const pawn = copySquares[start].id?.toLowerCase() === "p";
 
 		invalid =
 			pawn === true &&
 			this.goodPawn(start, end, copySquares, boardState, passantPos) === false;
 		if (invalid) return invalid;
-		var king = copySquares[start].id?.toLowerCase() === "k";
+		const king = copySquares[start].id?.toLowerCase() === "k";
 		if (king && Math.abs(end - start) === 2)
 			invalid = this.isCastlingPossible(start, end, copySquares, boardState) === false;
 
@@ -75,8 +75,8 @@ export default class Referee {
 
 	private isCastlingPossible(start: number, end: number, squares: PieceType[], boardState: IStateBoard) {
 		const copySquares = [...squares];
-		var player = copySquares[start].player;
-		var deltaPos = end - start;
+		const player = copySquares[start].player;
+		const deltaPos = end - start;
 		if (start !== (player === "w" ? 60 : 4)) return false;
 		if (
 			(deltaPos === 2
@@ -110,12 +110,12 @@ export default class Referee {
 	}
 
 	private blockersExist(start: number, end: number, squares: PieceType[]) {
-		var startRow = 8 - Math.floor(start / 8);
-		var startCol = (start % 8) + 1;
-		var endRow = 8 - Math.floor(end / 8);
-		var endCol = (end % 8) + 1;
-		let rowDiff = endRow - startRow;
-		let colDiff = endCol - startCol;
+		const startRow = 8 - Math.floor(start / 8);
+		const startCol = (start % 8) + 1;
+		const endRow = 8 - Math.floor(end / 8);
+		const endCol = (end % 8) + 1;
+		const rowDiff = endRow - startRow;
+		const colDiff = endCol - startCol;
 		let rowCtr = 0;
 		let colCtr = 0;
 		const copySquares = [...squares];
@@ -151,7 +151,7 @@ export default class Referee {
 		if (start === end)
 			return false;
 
-		var player = copySquares[start].player;
+		const player = copySquares[start].player;
 		if (
 			player === copySquares[end].player ||
 			copySquares[start].pieceCanMove(start, end) === false
@@ -161,7 +161,7 @@ export default class Referee {
 		if (this.isMoveInvalid(start, end, copySquares, boardState, passantPos) === true)
 			return false;
 
-		var cantCastle =
+		const cantCastle =
 			copySquares[start].id === (player === "w" ? "k" : "K") &&
 			Math.abs(end - start) === 2 &&
 			this.inCheck(player as "w" | "b", copySquares, boardState);
@@ -172,7 +172,7 @@ export default class Referee {
 			copySquares[start].id === (player === "w" ? "k" : "K") &&
 			Math.abs(end - start) === 2
 		) {
-			var deltaPos = end - start;
+			const deltaPos = end - start;
 			const testSquares = [...squares];
 			testSquares[start + (deltaPos === 2 ? 1 : -1)] = testSquares[start];
 			testSquares[start] = new PieceFiller();

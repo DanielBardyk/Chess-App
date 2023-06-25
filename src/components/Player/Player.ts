@@ -6,8 +6,7 @@ export default class Player {
 	public makePossibleMove(squares: PieceType[], start: number, end: number, statePassantPos: number, passantPos: number | null = null) {
 		const copySquares = [...squares];
 		// рокіровка
-		var isKing =
-			copySquares[start].id === "k" || copySquares[start].id === "K";
+		const isKing = copySquares[start].id === "k" || copySquares[start].id === "K";
 
 		if (isKing && Math.abs(end - start) === 2) {
 			if (end === (copySquares[start].id === "k" ? 62 : 6)) {
@@ -23,7 +22,7 @@ export default class Player {
 			}
 		}
 
-		var passant = passantPos === null ? statePassantPos : passantPos;
+		const passant = passantPos === null ? statePassantPos : passantPos;
 		if (copySquares[start].id?.toLowerCase() === "p") {
 			if (end - start === -7 || end - start === 9) {
 				if (start + 1 === passant)

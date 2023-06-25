@@ -9,7 +9,7 @@ export default class PieceEvaluator {
 		let pieceValue = 0;
 		if (piece.id === null) return 0;
 	 
-		var pawnEvalWhite = [
+		const pawnEvalWhite = [
 		  [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0],
 		  [5.0, 5.0, 5.0, 5.0, 5.0, 5.0, 5.0, 5.0],
 		  [1.0, 1.0, 2.0, 3.0, 3.0, 2.0, 1.0, 1.0],
@@ -19,9 +19,9 @@ export default class PieceEvaluator {
 		  [0.5, 1.0, 1.0, -2.0, -2.0, 1.0, 1.0, 0.5],
 		  [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0],
 		];
-		var pawnEvalBlack = this.reverseForBlack(pawnEvalWhite);
+		const pawnEvalBlack = this.reverseForBlack(pawnEvalWhite);
 	 
-		var knightEval = [
+		const knightEval = [
 		  [-5.0, -4.0, -3.0, -3.0, -3.0, -3.0, -4.0, -5.0],
 		  [-4.0, -2.0, 0.0, 0.0, 0.0, 0.0, -2.0, -4.0],
 		  [-3.0, 0.0, 1.0, 1.5, 1.5, 1.0, 0.0, -3.0],
@@ -32,7 +32,7 @@ export default class PieceEvaluator {
 		  [-5.0, -4.0, -3.0, -3.0, -3.0, -3.0, -4.0, -5.0],
 		];
 	 
-		var bishopEvalWhite = [
+		const bishopEvalWhite = [
 		  [-2.0, -1.0, -1.0, -1.0, -1.0, -1.0, -1.0, -2.0],
 		  [-1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, -1.0],
 		  [-1.0, 0.0, 0.5, 1.0, 1.0, 0.5, 0.0, -1.0],
@@ -42,9 +42,9 @@ export default class PieceEvaluator {
 		  [-1.0, 0.5, 0.0, 0.0, 0.0, 0.0, 0.5, -1.0],
 		  [-2.0, -1.0, -1.0, -1.0, -1.0, -1.0, -1.0, -2.0],
 		];
-		var bishopEvalBlack = this.reverseForBlack(bishopEvalWhite);
+		const bishopEvalBlack = this.reverseForBlack(bishopEvalWhite);
 	 
-		var rookEvalWhite = [
+		const rookEvalWhite = [
 		  [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0],
 		  [0.5, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 0.5],
 		  [-0.5, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, -0.5],
@@ -54,9 +54,9 @@ export default class PieceEvaluator {
 		  [-0.5, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, -0.5],
 		  [0.0, 0.0, 0.0, 0.5, 0.5, 0.0, 0.0, 0.0],
 		];
-		var rookEvalBlack = this.reverseForBlack(rookEvalWhite);
+		const rookEvalBlack = this.reverseForBlack(rookEvalWhite);
 	 
-		var evalQueen = [
+		const evalQueen = [
 		  [-2.0, -1.0, -1.0, -0.5, -0.5, -1.0, -1.0, -2.0],
 		  [-1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, -1.0],
 		  [-1.0, 0.0, 0.5, 0.5, 0.5, 0.5, 0.0, -1.0],
@@ -67,7 +67,7 @@ export default class PieceEvaluator {
 		  [-2.0, -1.0, -1.0, -0.5, -0.5, -1.0, -1.0, -2.0],
 		];
 	 
-		var kingEvalWhite = [
+		const kingEvalWhite = [
 		  [-3.0, -4.0, -4.0, -5.0, -5.0, -4.0, -4.0, -3.0],
 		  [-3.0, -4.0, -4.0, -5.0, -5.0, -4.0, -4.0, -3.0],
 		  [-3.0, -4.0, -4.0, -5.0, -5.0, -4.0, -4.0, -3.0],
@@ -77,7 +77,7 @@ export default class PieceEvaluator {
 		  [2.0, 2.0, 0.0, 0.0, 0.0, 0.0, 2.0, 2.0],
 		  [2.0, 3.0, 1.0, 0.0, 0.0, 1.0, 3.0, 2.0],
 		];
-		var kingEvalBlack = this.reverseForBlack(kingEvalWhite);
+		const kingEvalBlack = this.reverseForBlack(kingEvalWhite);
 	 
 		let x = Math.floor(position / 8);
 		let y = position % 8;
