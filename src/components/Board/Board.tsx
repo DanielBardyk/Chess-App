@@ -103,18 +103,6 @@ export default class Board extends React.Component<IBoardProps, IStateBoard> {
 		}
 	}
 
-	private highlightMateHelper(squares: PieceType[], player: string) {
-		const opponent = player === "w" ? "b" : "w";
-		return (
-			this.highlighter.highlightMate(
-				opponent,
-				squares,
-				this.referee.checkmate(opponent, squares, this.state),
-				this.referee.stalemate(opponent, squares, this.state)
-			)
-		);
-	}
-
 	private updateRookHasMoved(player: "w" | "b", start: number) {
 		if (start === (player === "w" ? 56 : 0)) {
 			if (player === "w") {
@@ -137,6 +125,18 @@ export default class Board extends React.Component<IBoardProps, IStateBoard> {
 				});
 			}
 		}
+	}
+
+	private highlightMateHelper(squares: PieceType[], player: string) {
+		const opponent = player === "w" ? "b" : "w";
+		return (
+			this.highlighter.highlightMate(
+				opponent,
+				squares,
+				this.referee.checkmate(opponent, squares, this.state),
+				this.referee.stalemate(opponent, squares, this.state)
+			)
+		);
 	}
 
 	private movePiece(player: "w" | "b", squares: PieceType[], start: number, end: number) {
@@ -205,15 +205,65 @@ export default class Board extends React.Component<IBoardProps, IStateBoard> {
 		return isTwoKings
 	}
 
-	private handlePanelPieceChoose(piece: PanelType) {
-		if (this.state.selectedPiece === piece) {
-			this.setState({
-				selectedPiece: null
-			})
-		} else {
-			this.setState({
-				selectedPiece: piece
-			})
+	private runBot() {
+		if (this.state.againstBot) {
+			let searchDepth = 3;
+			setTimeout(() => {
+				this.bot.execute(
+					searchDepth, 
+					this.state.squares,
+					this.state.firstPos,
+					this.state.secondPos,
+					this.state, 
+					this.movePiece.bind(this));
+			}, 1200);
+		}
+	}
+
+	private handleInvalidMove(i: number, squares: PieceType[]) {
+		squares[this.state.source].highlight = 0;
+		squares = [...this.highlighter.clearPossibleMoveHighlight(squares)];
+
+		// якщо хід не виводить із шаху підсвічуємо
+		if (i !== this.state.source && this.referee.inCheck(this.state.turn, squares, this.state)) {
+			squares = this.highlighter.highlightCheck(squares, this.state.turn);
+		}
+
+		this.setState({
+			source: -1,
+			squares: squares,
+		});
+	}
+
+	private handleSamePieceTwice(i: number, squares: PieceType[]) {
+		squares[i].highlight = 1;
+		squares[this.state.source].highlight = 0;
+		squares = [...this.highlighter.clearPossibleMoveHighlight(squares)];
+		
+		for (let j = 0; j < 64; j++) {
+			if (this.referee.pieceCanMoveThere(i, j, squares, this.state))
+			squares[j].possible = 1;
+		}
+
+		this.setState({
+			source: i,
+			squares: squares,
+		});
+	}
+
+	private handleSecondClick(i: number, squares: PieceType[]) {
+		const isPlayerPiece = squares[i].player === this.state.turn;
+
+		if (isPlayerPiece && this.state.source !== i) {
+			this.handleSamePieceTwice(i, squares);
+		}
+		else if (!this.referee.pieceCanMoveThere(this.state.source, i, squares, this.state)) {
+			this.handleInvalidMove(i, squares);
+		}
+		else {
+			this.movePiece(this.state.turn, squares, this.state.source, i);
+			if(this.state.mated) return;
+			this.runBot();
 		}
 	}
 
@@ -235,68 +285,6 @@ export default class Board extends React.Component<IBoardProps, IStateBoard> {
 				source: i,
 				squares: squares,
 			});
-		}
-	}
-
-	private handleSamePieceTwice(i: number, squares: PieceType[]) {
-		squares[i].highlight = 1;
-		squares[this.state.source].highlight = 0;
-		squares = [...this.highlighter.clearPossibleMoveHighlight(squares)];
-		
-		for (let j = 0; j < 64; j++) {
-			if (this.referee.pieceCanMoveThere(i, j, squares, this.state))
-			squares[j].possible = 1;
-		}
-
-		this.setState({
-			source: i,
-			squares: squares,
-		});
-	}
-
-	private handleInvalidMove(i: number, squares: PieceType[]) {
-		squares[this.state.source].highlight = 0;
-		squares = [...this.highlighter.clearPossibleMoveHighlight(squares)];
-
-		// якщо хід не виводить із шаху підсвічуємо
-		if (i !== this.state.source && this.referee.inCheck(this.state.turn, squares, this.state)) {
-			squares = this.highlighter.highlightCheck(squares, this.state.turn);
-		}
-
-		this.setState({
-			source: -1,
-			squares: squares,
-		});
-	}
-
-	private handleSecondClick(i: number, squares: PieceType[]) {
-		const isPlayerPiece = squares[i].player === this.state.turn;
-
-		if (isPlayerPiece && this.state.source !== i) {
-			this.handleSamePieceTwice(i, squares);
-		}
-		else if (!this.referee.pieceCanMoveThere(this.state.source, i, squares, this.state)) {
-			this.handleInvalidMove(i, squares);
-		}
-		else {
-			this.movePiece(this.state.turn, squares, this.state.source, i);
-			if(this.state.mated) return;
-			this.runBot();
-		}
-	}
-
-	private runBot() {
-		if (this.state.againstBot) {
-			let searchDepth = 3;
-			setTimeout(() => {
-				this.bot.execute(
-					searchDepth, 
-					this.state.squares,
-					this.state.firstPos,
-					this.state.secondPos,
-					this.state, 
-					this.movePiece.bind(this));
-			}, 1200);
 		}
 	}
 
@@ -365,6 +353,18 @@ export default class Board extends React.Component<IBoardProps, IStateBoard> {
 			this.handleFirstClick(i, copySquares);
 		} else if (this.state.source > -1) {
 			this.handleSecondClick(i, copySquares);
+		}
+	}
+
+	private handlePanelPieceChoose(piece: PanelType) {
+		if (this.state.selectedPiece === piece) {
+			this.setState({
+				selectedPiece: null
+			})
+		} else {
+			this.setState({
+				selectedPiece: piece
+			})
 		}
 	}
 
