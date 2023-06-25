@@ -1,0 +1,52 @@
+.white_square {
+	background-color: #FFE4B5;
+}
+
+.black_square {
+background-color: #A0522D;
+}
+
+.highlighted_square {
+	background-color: #ffbe3ccf;
+}
+
+.in_check_square {
+	animation: flash-white 0.5s;
+	background-color: #deeaee;
+}
+
+.check_mate_square {
+	background-color: #9d3d36;
+}
+
+.stale_square {
+	background-color: #ffac2c;
+}
+
+.training_piece_square {
+	background-color: #c8b1dc60;
+}
+
+.top_left_square {
+	border-radius: 8px 0px 0px 0px;
+}
+
+.top_right_square {
+	border-radius: 0px 8px 0px 0px;
+}
+
+.bottom_left_square {
+	border-radius: 0px 0px 0px 8px;
+}
+
+.bottom_right_square {
+	border-radius: 0px 0px 8px 0px;
+}
+
+.pointer_cursor {
+	cursor: pointer;
+}
+
+.default_cursor {
+	cursor: default;
+}

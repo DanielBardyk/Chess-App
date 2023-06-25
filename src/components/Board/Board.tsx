@@ -223,26 +223,12 @@ export default class Board extends React.Component<any, IStateBoard> {
 		if (squares[i].player !== null) {
 			squares = this.highlighter.clearCheckHighlight(squares, this.state.turn);
 
-			// console.log("value of i: " + i);
-
-			/* for (let j = 0; j < 64; j++) {
-				console.log(j + " highlight: " + squares[j].highlight);
-			} */
-
-			// console.log(squares[i]);
-
-			console.log(squares);
 			squares[i].highlight = 1;
-
-			// for (let j = 0; j < 64; j++) {
-			// 	console.log(j + " highlight 2: " + squares[j].highlight);
-			// }
 
 			for (let j = 0; j < 64; j++) {
 				if (this.referee.pieceCanMoveThere(i, j, squares, this.state)) {
 					squares[j].possible = 1;
 				}
-				// console.log(j + " possible: " + squares[j].possible);
 			}
 
 			this.setState({
@@ -430,7 +416,7 @@ export default class Board extends React.Component<any, IStateBoard> {
 					size: "square_piece_selection ",
 					color: this.stylesCalculator.calcColorTrainingPiece(panelElements[i], this.state),
 					corner: squareCorner,
-					cursor: "pointer",
+					cursor: "pointer_cursor",
 					onClick: () => {
 						this.handlePanelPieceChoose(panelElements[i])
 					}
