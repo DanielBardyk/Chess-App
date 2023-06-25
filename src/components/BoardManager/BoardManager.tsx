@@ -2,8 +2,7 @@ import { PieceCleaner } from "../PieceCleaner/PieceCleaner";
 import { Pawn, King, Queen, Bishop, Knight, Rook, PieceFiller } from "../Pieces/Pieces"
 import Label from "../Label/Label";
 import { IStateBoard } from "../Board/BoardTypes";
-
-export type PanelType = King | Queen | Bishop | Knight | Rook | PieceCleaner
+import { PanelType } from "./BoardManagerTypes";
 	
 export default class BoardManager {
 	public initializeEmptyBoard() {

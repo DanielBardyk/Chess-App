@@ -1,7 +1,6 @@
 import { PieceFiller, PieceType, Queen } from "../Pieces/Pieces";
 
 export default class Player {
-
 	public makePossibleMove(squares: PieceType[], start: number, end: number, statePassantPos: number, passantPos: number | null = null) {
 		const copySquares = [...squares];
 		// рокіровка

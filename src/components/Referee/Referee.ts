@@ -2,7 +2,6 @@ import { IStateBoard } from "../Board/BoardTypes";
 import { PieceFiller, PieceType, Queen } from "../Pieces/Pieces";
 
 export default class Referee {
-
 	private goodPawn(start: number, end: number, squares: PieceType[], boardState: IStateBoard, passantPos: number | null = null) {
 		const passant = passantPos === null ? boardState.passantPos : passantPos;
 		const startRow = 8 - Math.floor(start / 8);

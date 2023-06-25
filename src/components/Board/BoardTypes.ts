@@ -1,4 +1,4 @@
-import { PanelType } from "../BoardManager/BoardManager";
+import { PanelType } from "../BoardManager/BoardManagerTypes";
 import { PieceType } from "../Pieces/Pieces";
 import Saver from "../Saver/Saver";
 import SquareRenderer from "../SquareRenderer/SquareRenderer";

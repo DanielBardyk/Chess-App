@@ -1,7 +1,7 @@
 import React from "react";
 import { Pawn, King, Queen, Bishop, Knight, Rook, PieceFiller, PieceType } from "../Pieces/Pieces"
 import Saver from "../Saver/Saver";
-import BoardManager, { PanelType } from "../BoardManager/BoardManager";
+import BoardManager from "../BoardManager/BoardManager";
 import Highlighter from "../Highlighter/Highlighter";
 import SquareRenderer from "../SquareRenderer/SquareRenderer";
 import Referee from "../Referee/Referee";
@@ -9,6 +9,7 @@ import Bot from "../Bot/Bot";
 import Player from "../Player/Player";
 import { IBoardProps, IStateBoard, IStateSerialized } from "./BoardTypes";
 import StylesCalculator from "../StylesCalculator/StylesCalculator";
+import { PanelType } from "../BoardManager/BoardManagerTypes";
 
 export default class Board extends React.Component<any, IStateBoard> {
 	private boardManager: BoardManager = new BoardManager();

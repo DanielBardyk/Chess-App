@@ -1,7 +1,6 @@
 import { IStateBoard } from "../Board/BoardTypes";
-import { PanelType } from "../BoardManager/BoardManager";
+import { PanelType } from "../BoardManager/BoardManagerTypes";
 import { King, PieceType } from "../Pieces/Pieces";
-
 
 export default class StylesCalculator {
 	public calcSquareColor(i: number, j: number, squares: PieceType[]) {
