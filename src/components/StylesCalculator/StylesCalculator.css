@@ -11,7 +11,7 @@ background-color: #A0522D;
 }
 
 .in_check_square {
-	animation: flash-white 0.5s;
+	animation: flash-piece 0.5s;
 	background-color: #deeaee;
 }
 
@@ -49,4 +49,13 @@ background-color: #A0522D;
 
 .default_cursor {
 	cursor: default;
+}
+
+@keyframes flash-piece {
+
+	from,
+	50%,
+	to {
+		background-color: #ff4233;
+	}
 }

@@ -7,9 +7,9 @@ import SquareRenderer from "../SquareRenderer/SquareRenderer";
 import Referee from "../Referee/Referee";
 import Bot from "../Bot/Bot";
 import Player from "../Player/Player";
-import { IBoardProps, IStateBoard, IStateSerialized } from "./BoardTypes";
 import StylesCalculator from "../StylesCalculator/StylesCalculator";
 import { PanelType } from "../BoardManager/BoardManager.types";
+import { IBoardProps, IStateBoard, IStateSerialized } from "./Board.types";
 
 export default class Board extends React.Component<any, IStateBoard> {
 	private boardManager: BoardManager = new BoardManager();

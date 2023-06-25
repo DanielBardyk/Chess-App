@@ -1,8 +1,8 @@
 import { PieceCleaner } from "../PieceCleaner/PieceCleaner";
 import { Pawn, King, Queen, Bishop, Knight, Rook, PieceFiller } from "../Pieces/Pieces"
 import Label from "../Label/Label";
-import { IStateBoard } from "../Board/BoardTypes";
 import { PanelType } from "./BoardManager.types";
+import { IStateBoard } from "../Board/Board.types";
 	
 export default class BoardManager {
 	public initializeEmptyBoard() {

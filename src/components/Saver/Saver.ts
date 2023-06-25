@@ -1,4 +1,4 @@
-import { IStateBoard, IStateSerialized } from "../Board/BoardTypes";
+import { IStateBoard, IStateSerialized } from "../Board/Board.types";
 
 export default class Saver {
 	private saveObjectAsFile(object: IStateBoard) {

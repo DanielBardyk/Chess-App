@@ -1,4 +1,4 @@
-import { IStateBoard } from "../Board/BoardTypes";
+import { IStateBoard } from "../Board/Board.types";
 import { PanelType } from "../BoardManager/BoardManager.types";
 import { King, PieceType } from "../Pieces/Pieces";
 

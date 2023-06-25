@@ -1,4 +1,4 @@
-import { IStateBoard } from "../Board/BoardTypes";
+import { IStateBoard } from "../Board/Board.types";
 import { PieceFiller, PieceType, Queen } from "../Pieces/Pieces";
 
 export default class Referee {

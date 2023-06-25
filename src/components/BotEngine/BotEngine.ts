@@ -1,4 +1,5 @@
-import { IStateBoard } from "../Board/BoardTypes";
+
+import { IStateBoard } from "../Board/Board.types";
 import PieceEvaluator from "../PieceEvaluator/PieceEvaluator";
 import { PieceType } from "../Pieces/Pieces";
 import Referee from "../Referee/Referee";
