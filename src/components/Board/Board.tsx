@@ -27,8 +27,8 @@ export interface IStateBoard {
 	leftWhiteRookHasMoved: number, // Referee
 	rightWhiteRookHasMoved: number, // Referee
 	passantPos: number,
-	botRunning: number,
 	error: string | null,
+	botRunning: boolean,
 	firstRender: boolean,
 	gameStarted: boolean,
 	piecesSelection: boolean,
@@ -82,8 +82,8 @@ export default class Board extends React.Component<any, IStateBoard> {
 			leftWhiteRookHasMoved: 0,
 			rightWhiteRookHasMoved: 0,
 			passantPos: 65,
-			botRunning: 0,
 			error: null,
+			botRunning: false,
 			firstRender: true,
 			gameStarted: false,
 			piecesSelection: false,
@@ -119,8 +119,8 @@ export default class Board extends React.Component<any, IStateBoard> {
 			leftWhiteRookHasMoved: 0,
 			rightWhiteRookHasMoved: 0,
 			passantPos: 65,
-			botRunning: 0,
 			error: null,
+			botRunning: false,
 			firstRender: true,
 			gameStarted: false,
 			piecesSelection: false,
@@ -169,19 +169,10 @@ export default class Board extends React.Component<any, IStateBoard> {
 	}
 
 	private movePiece(player: "w" | "b", squares: PieceType[], start: number, end: number) {
-		let copySquares = [...squares];
+		let copySquares = this.highlighter.clearHighlight([...squares]);
 
-		copySquares = [...this.highlighter.clearHighlight(copySquares)];
 		if (!(this.state.againstBot && player === "b")) {
-			copySquares = [...this.highlighter.clearPossibleMoveHighlight(copySquares)];
-			for (let j = 0; j < 64; j++) {
-				if (copySquares[start].id === (player === "w" ? "k" : "K")) {
-					let king = copySquares[j] as King;
-					king.inCheck = 0;
-					copySquares[j] = king;
-					break;
-				}
-			}
+			copySquares = this.highlighter.clearOnBotMoveHighlight(copySquares, start, player);
 		}
 
 		if (copySquares[start].id === (player === "w" ? "k" : "K")) {
@@ -192,20 +183,10 @@ export default class Board extends React.Component<any, IStateBoard> {
 			this.updateRookHasMoved(player, start)
 		}
 
-		const playerComponent = new Player()
-		copySquares = [...playerComponent.makePossibleMove(copySquares, start, end, this.state.passantPos)];
+		const playerComponent = new Player();
+		copySquares = playerComponent.makePossibleMove(copySquares, start, end, this.state.passantPos);
 
-		var passanTrue =
-			player === "w"
-				? copySquares[end].id === "p" &&
-				start >= 48 &&
-				start <= 55 &&
-				end - start === -16
-				: copySquares[end].id === "P" &&
-				start >= 8 &&
-				start <= 15 &&
-				end - start === 16;
-		let passant = passanTrue ? end : 65;
+		const passant = this.referee.checkMoveForPassant(player, copySquares, start, end);
 
 		if (player === "w") {
 			copySquares = [...this.highlighter.highlightMate(
@@ -235,7 +216,7 @@ export default class Board extends React.Component<any, IStateBoard> {
 			source: -1,
 			mated: checkMated || staleMated ? true : false,
 			turn: player === "b" ? "w" : "b",
-			botRunning: (this.state.againstBot && player === "w") ? 1 : 0,
+			botRunning: (this.state.againstBot && player === "w") ? true : false,
 		});
 	}
 
@@ -426,7 +407,7 @@ export default class Board extends React.Component<any, IStateBoard> {
 			this.handlePieceSelection(i, copySquares);
 		} else if (this.state.mated) {
 			return "game-over"
-		} else if (this.state.source === -1 && this.state.botRunning === 0) {
+		} else if (this.state.source === -1 && !this.state.botRunning) {
 			this.handleFirstClick(i, copySquares);
 		} else if (this.state.source > -1) {
 			this.handleSecondClick(i, copySquares);

@@ -192,6 +192,14 @@ export default class Referee {
 		return true;
 	}
 
+	public checkMoveForPassant(player: "w" | "b", squares: PieceType[], start: number, end: number) {
+		const passantTrue =
+			 player === "w"
+				? squares[end].id === "p" && start >= 48 && start <= 55 && end - start === -16
+				: squares[end].id === "P" && start >= 8 && start <= 15 && end - start === 16;
+		return passantTrue ? end : 65;
+	}
+
 	public stalemate(player: "w" | "b", squares: PieceType[], boardState: IStateBoard) {
 		if (this.inCheck(player, squares, boardState)) return false;
 

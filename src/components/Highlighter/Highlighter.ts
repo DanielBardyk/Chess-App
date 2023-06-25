@@ -56,4 +56,17 @@ export default class Highlighter {
 		}
 		return copySquares;
 	}
+
+	public clearOnBotMoveHighlight(squares: PieceType[], start: number, player: "w" | "b") {
+		const copySquares = this.clearPossibleMoveHighlight(squares);
+		for (let j = 0; j < 64; j++) {
+			if (squares[start].id === (player === "w" ? "k" : "K")) {
+				let king = squares[j] as King;
+				king.inCheck = 0;
+				squares[j] = king;
+				break;
+			}
+		}
+		return copySquares;
+	}
 }

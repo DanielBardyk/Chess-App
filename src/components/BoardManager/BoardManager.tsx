@@ -149,7 +149,7 @@ export default class BoardManager {
 
 	public calcSquareCursor(i: number, j: number, copySquares: PieceType[], boardState: IStateBoard) {
 		let squareCursor = (boardState.turn === copySquares[i * 8 + j].player && !boardState.botRunning) ? "pointer" : "default";
-		if (boardState.botRunning === 1 && !boardState.mated) squareCursor = "bot_running";
+		if (boardState.botRunning && !boardState.mated) squareCursor = "bot_running";
 		if (boardState.mated) squareCursor = "default";
 		if(boardState.piecesSelection) squareCursor = "pointer";
 
