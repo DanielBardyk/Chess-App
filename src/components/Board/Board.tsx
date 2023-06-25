@@ -132,6 +132,42 @@ export default class Board extends React.Component<any, IStateBoard> {
 		});
 	}
 
+	private updateKingHasMoved(player: "w" | "b") {
+		if (player === "w") {
+			 this.setState({
+				whiteKingHasMoved: 1,
+			});
+		} else {
+			 this.setState({
+				blackKingHasMoved: 1,
+			});
+		}
+	}
+
+	private updateRookHasMoved(player: "w" | "b", start: number) {
+		if (start === (player === "w" ? 56 : 0)) {
+			if (player === "w") {
+				this.setState({
+					leftWhiteRookHasMoved: 1,
+				});
+			} else {
+				this.setState({
+					leftBlackRookHasMoved: 1,
+				});
+			}
+		} else if (start === (player === "w" ? 63 : 7)) {
+			if (player === "w") {
+				this.setState({
+					rightWhiteRookHasMoved: 1,
+				});
+			} else {
+				this.setState({
+					rightBlackRookHasMoved: 1,
+				});
+			}
+		}
+	}
+
 	private movePiece(player: "w" | "b", squares: PieceType[], start: number, end: number) {
 		let copySquares = [...squares];
 
@@ -149,41 +185,11 @@ export default class Board extends React.Component<any, IStateBoard> {
 		}
 
 		if (copySquares[start].id === (player === "w" ? "k" : "K")) {
-			if (player === "w") {
-				this.setState({
-					whiteKingHasMoved: 1,
-				});
-			} else {
-				this.setState({
-					blackKingHasMoved: 1,
-				});
-			}
+			this.updateKingHasMoved(player);
 		}
 
 		if (copySquares[start].id === (player === "w" ? "r" : "R")) {
-			// якщо походила ліва тура, то змінюємо пропс, який буде вказувати, що рокіровку через ферзевий фланг більше зробити не можна
-			if (start === (player === "w" ? 56 : 0)) {
-				if (player === "w") {
-					this.setState({
-						leftWhiteRookHasMoved: 1,
-					});
-				} else {
-					this.setState({
-						leftBlackRookHasMoved: 1,
-					});
-				}
-				// якщо походила права тура, то змінюємо пропс, який буде вказувати, що рокіровку через королівський фланг більше зробити не можна
-			} else if (start === (player === "w" ? 63 : 7)) {
-				if (player === "w") {
-					this.setState({
-						rightWhiteRookHasMoved: 1,
-					});
-				} else {
-					this.setState({
-						rightBlackRookHasMoved: 1,
-					});
-				}
-			}
+			this.updateRookHasMoved(player, start)
 		}
 
 		const playerComponent = new Player()
