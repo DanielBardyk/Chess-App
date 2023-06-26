@@ -1,20 +1,19 @@
+import { IStateBoard } from "../Board/Board.types";
 import { King, PieceType } from "../Pieces/Pieces";
+import Referee from "../Referee/Referee";
 
 export default class Highlighter {
-
-	public highlightMate(player: "w" | "b", squares: PieceType[], checkMated: boolean, staleMated: boolean) {
-		const copySquares = [...squares];
-		if (checkMated || staleMated) {
-			for (let j = 0; j < 64; j++) {
-				if (copySquares[j].id === (player === "w" ? "k" : "K")) {
-					const king = copySquares[j] as King;
-					king.inCheck = checkMated === true ? 1 : 2;
-					copySquares[j] = king;
-					break;
-				}
-			}
-		}
-		return copySquares;
+	public highlightMate(squares: PieceType[], player: string, boardState: IStateBoard) {
+		const opponent = player === "w" ? "b" : "w";
+		const referee = new Referee();
+		return (
+			this._highlightMate(
+				opponent,
+				squares,
+				referee.checkmate(opponent, squares, boardState),
+				referee.stalemate(opponent, squares, boardState)
+			)
+		);
 	}
 
 	public highlightCheck(squares: PieceType[], turn: "w" | "b") {
@@ -70,4 +69,20 @@ export default class Highlighter {
 		}
 		return copySquares;
 	}
+
+	private _highlightMate(player: "w" | "b", squares: PieceType[], checkMated: boolean, staleMated: boolean) {
+		const copySquares = [...squares];
+		if (checkMated || staleMated) {
+			for (let j = 0; j < 64; j++) {
+				if (copySquares[j].id === (player === "w" ? "k" : "K")) {
+					const king = copySquares[j] as King;
+					king.inCheck = checkMated === true ? 1 : 2;
+					copySquares[j] = king;
+					break;
+				}
+			}
+		}
+		return copySquares;
+	}
+
 }

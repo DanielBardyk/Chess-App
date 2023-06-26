@@ -127,18 +127,6 @@ export default class Board extends React.Component<IBoardProps, IStateBoard> {
 		}
 	}
 
-	private highlightMateHelper(squares: PieceType[], player: string) {
-		const opponent = player === "w" ? "b" : "w";
-		return (
-			this.highlighter.highlightMate(
-				opponent,
-				squares,
-				this.referee.checkmate(opponent, squares, this.state),
-				this.referee.stalemate(opponent, squares, this.state)
-			)
-		);
-	}
-
 	private movePiece(player: "w" | "b", squares: PieceType[], start: number, end: number) {
 		let copySquares = this.highlighter.clearHighlight([...squares]);
 
@@ -159,7 +147,7 @@ export default class Board extends React.Component<IBoardProps, IStateBoard> {
 
 		const passant = this.referee.checkMoveForPassant(player, copySquares, start, end);
 
-		this.highlightMateHelper(copySquares, player);
+		this.highlighter.highlightMate(copySquares, player, this.state);
 
 		const { checkMated, staleMated } = this.referee.checkForMateStatus(copySquares, player, this.state);
 
