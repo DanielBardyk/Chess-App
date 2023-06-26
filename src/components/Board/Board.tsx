@@ -298,11 +298,11 @@ export default class Board extends React.Component<IBoardProps, IStateBoard> {
 		) {
 			return;
 		} else if (
-			this.referee.pieceCount("q", checkedSquares, this.state) >= 9 || 
-			this.referee.pieceCount("b", checkedSquares, this.state) >= 10 || 
-			this.referee.pieceCount("n", checkedSquares, this.state) >= 10 || 
-			this.referee.pieceCount("r", checkedSquares, this.state) >= 10 || 
-			this.referee.pieceCount("p", checkedSquares, this.state) >= 8
+			this.referee.pieceCount("q", checkedSquares, this.state) === 9 || 
+			this.referee.pieceCount("b", checkedSquares, this.state) === 10 || 
+			this.referee.pieceCount("n", checkedSquares, this.state) === 10 || 
+			this.referee.pieceCount("r", checkedSquares, this.state) === 10 || 
+			this.referee.pieceCount("p", checkedSquares, this.state) === 8
 			) {
 			return;
 		}
