@@ -16,9 +16,9 @@ export default class BotEngine {
 	public minimax(
 		depth: number,
 		isBlackPlayer: boolean,
-		alpha: number, // поточне найкраще значення, яке може досягти чорний гравець, який максимізує (для альфа-бета відсікання)
-		beta: number, // поточне найкраще значення, яке може досягти білий гравець, який мінімізує (для альфа-бета відсікання)
-		squares: PieceType[], // приймаємо стан шахової дошки після виконання ходу
+		alpha: number, // поточне найкраще значення, яке може досягти чорний гравець
+		beta: number, // поточне найкраще значення, яке може досягти білий гравець
+		squares: PieceType[], // стан шахової дошки після виконання ходу
 		raOfStarts: number[],
 		raOfEnds: number[],
 		passantPos: number | null,
