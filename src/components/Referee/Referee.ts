@@ -272,7 +272,17 @@ export default class Referee {
 		else return false
 	}
 
-	public pieceCount(id: string, squares: PieceType[], boardState: IStateBoard) {
+	public isPieceNumValid(square: PieceType[], boardState: IStateBoard) {
+		return (
+			this.pieceCount("q", square, boardState) < 9 && 
+			this.pieceCount("b", square, boardState) < 10 && 
+			this.pieceCount("n", square, boardState) < 10 && 
+			this.pieceCount("r", square, boardState) < 10 && 
+			this.pieceCount("p", square, boardState) < 8
+		)
+	}
+
+	private pieceCount(id: string, squares: PieceType[], boardState: IStateBoard) {
 		return (
 			squares.filter(
 				(p) => 
